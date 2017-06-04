@@ -2,8 +2,10 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 from sqlalchemy.ext.declarative import declarative_base
 from configparser import ConfigParser  
+from tabulate import tabulate
 
 
+import asyncio
 import discord
 from discord.ext import commands
 import random
@@ -37,13 +39,14 @@ class Member(Base):
     dp = Column(Integer)
     gear_score = Column(Integer)
 
-
+members = session.query(Member).order_by(Member.gear_score.desc()).all()
 
 description = '''
 This the official Gear Score bot of the Legendary Guild Sazerac.
 Made by drawven(drawven@gmail.com)
 '''
 bot = commands.Bot(command_prefix='?', description=description)
+
 
 @bot.event
 async def on_ready():
@@ -52,10 +55,29 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+@bot.event
+async def on_message(message):
+    if message.content.startswith('gsbot add'):
+        await bot.send_message(message.channel,"Addin player")
+        print(message.author)
+    elif message.content.startswith('gsbot sleep'):
+        await asyncio.sleep(5)
+        await bot.send_message(message.channel, 'Done sleeping for 5')
+
+    await bot.process_commands(message)
+
 @bot.command()
-async def add(left : int, right : int):
-    """Adds two numbers together."""
-    await bot.say(left + right)
+async def list(num=10):
+    """List all the members and their gear score with optional limit. 
+    eg. ?list returns first 10 by default  and ?list 5 first 5 sorted by
+    gear score"""
+
+    data =tabulate([[u.fam_name,u.char_name, u.gear_score] for u in members[:num]], 
+                   ['Family', 'Character', 'GearScore'],
+                   'simple',
+                   stralign='center')
+    await bot.say(data)
+
 
 @bot.group(pass_context=True)
 async def cool(ctx):
