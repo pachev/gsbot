@@ -1,10 +1,12 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 from sqlalchemy.ext.declarative import declarative_base
+
 from configparser import ConfigParser  
 from tabulate import tabulate
 import numpy as np
 from datetime import datetime
+
 
 
 import asyncio
@@ -24,6 +26,8 @@ session = Session()
 config = ConfigParser()  
 config.read('config.ini')  
 token = config.get('auth', 'token2') 
+
+
 
 #this is where I declare the class for the ORM based on the original spreadsheet
 class Member(Base):
@@ -48,6 +52,12 @@ This the official Gear Score bot of the Legendary Guild Sazerac.
 Made by drawven(drawven@gmail.com)
 '''
 bot = commands.Bot(command_prefix='gsbot ', description=description)
+
+headers = ['Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
+
+#utility method to wrap string in codeblocks
+def codify(s):
+    return '```\n' + s + '\n```'
 
 
 @bot.event
@@ -94,7 +104,7 @@ async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_c
             session.commit()
             info = [["Success Adding User"], ["Character", char_name], ["gear_score", ap+dp], ["Discord", ctx.message.author.id]]
 
-            await bot.say(tabulate(info))
+            await bot.say(codify(tabulate(info)))
             
         except:
             await bot.say("Something went horribly wrong")
@@ -141,7 +151,7 @@ async def add(ctx,
                 session.commit()
                 info = [["Success Adding User"], ["Character", char_name], ["gear_score", ap+dp], ["Discord", user.id]]
 
-                await bot.say(tabulate(info))
+                await bot.say(codify(tabulate(info)))
                 
             except:
                 await bot.say("Something went horribly wrong")
@@ -166,7 +176,7 @@ async def update_me(ctx, level: int, ap: int, dp: int):
 
         session.commit()
 
-        await bot.say(tabulate(info))
+        await bot.say(codify(tabulate(info)))
         
     except Error:
         print(Error)
@@ -199,7 +209,7 @@ async def update(ctx, level: int, ap: int, dp: int, user: discord.Member):
 
             session.commit()
 
-            await bot.say(tabulate(info))
+            await bot.say(codify(tabulate(info)))
             
         except Error:
             print(Error)
@@ -223,7 +233,7 @@ async def delete(ctx, user: discord.Member):
             info = [["Success Deleting User"], ["Character", member.char_name], ["Discord", user.id]]
             session.commit()
 
-            await bot.say(tabulate(info))
+            await bot.say(codify(tabulate(info)))
             
         except:
             await bot.say("Error deleting user")
@@ -238,7 +248,7 @@ async def delete_me(ctx):
         info = [["Success Deleting User"], ["Character", member.char_name], ["Discord", ctx.message.author.id]]
         session.commit()
 
-        await bot.say(tabulate(info))
+        await bot.say(codify(tabulate(info)))
         
     except:
         await bot.say("Error deleting user")
@@ -249,50 +259,63 @@ async def list(num=10):
     """List all the members and their gear score with optional limit. 
     eg. ?list returns first 10 by default  and ?list 5 first 5 sorted by
     gear score"""
-    members = session.query(Member).order_by(Member.gear_score.desc()).all()
-    if num > 45:
-        nums = 45
-    else:
-        nums = num
-    data =tabulate([[u.fam_name,u.char_name, u.rank, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members[:nums]], 
-                   ['Family', 'Character', 'Rank', 'Class', 'Level', 'Ap', 'DP','GearScore', 'Updated'],
-                   'simple',
-                   stralign='left')
-    await bot.say(data)
+    try:
+        members = session.query(Member).order_by(Member.gear_score.desc()).all()
+        rows = [[u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members[:num]] 
+
+        data = tabulate(rows,
+                        headers,
+                       'simple',)
+        await bot.say(codify(data))
+    except:
+        await bot.say("Something went horribly wrong")
+
 
 @bot.command()
 async def over(num=350):
     """List all the members over a certain gear score"""
-    members = session.query(Member).order_by(Member.gear_score.desc()).all()
-    data =tabulate([[u.fam_name,u.char_name, u.gear_score] for u in members if u.gear_score >= num], 
-                   ['Family', 'Character', 'GearScore'],
-                   'simple',
-                   stralign='center')
-    print(data)
-    await bot.say(data)
+    try:
+        members = session.query(Member).order_by(Member.gear_score.desc()).all()
+        rows =[[u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members if u.gear_score >= num]
+
+        data = tabulate(rows,
+                        headers,
+                       'simple',)
+        await bot.say(codify(data))
+    except:
+        await bot.say("Something went horribly wrong")
+
 
 @bot.command()
 async def under(num=350):
     """List all the members under a certain gear score"""
-    members = session.query(Member).order_by(Member.gear_score.desc()).all()
-    data =tabulate([[u.fam_name,u.char_name, u.gear_score] for u in members if u.gear_score <= num], 
-                   ['Family', 'Character', 'GearScore'],
-                   'simple',
-                   stralign='center')
-    print(data)
-    await bot.say(data)
+    try:
+        members = session.query(Member).order_by(Member.gear_score.desc()).all()
+        rows =[[u.fam_name, u.char_name,  u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members if u.gear_score <= num]
+        data = tabulate(rows,
+                        headers,
+                       'simple',)
+        await bot.say(codify(data))
+    except:
+        await bot.say("Something went horribly wrong")
+
 
 @bot.command()
 async def lookup(name=""):
     """Looks up a guild member by score"""
-    member = session.query(Member).filter(or_(Member.fam_name.ilike('%'+name+'%'),
-                                              Member.char_name.ilike('%'+name+'%'))).all()
-    data =tabulate([[u.fam_name,u.char_name, u.gear_score] for u in member], 
-                   ['Family', 'Character', 'GearScore'],
-                   'simple',
-                   stralign='center')
-    print(data)
-    await bot.say(data)
+    try:
+        members = session.query(Member).filter(or_(Member.fam_name.ilike('%'+name+'%'),
+                                                  Member.char_name.ilike('%'+name+'%'))).all()
+        rows =[[u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members]
+
+        data = tabulate(rows,
+                        headers,
+                       'simple',)
+
+        await bot.say(codify(data))
+    except:
+        await bot.say("Something went horribly wrong")
+
 
 @bot.command()
 async def average():
@@ -308,21 +331,25 @@ async def average():
 async def info():
     """List important gear score info. Lowest, highest, average, newest(not yet), oldest, total users, total officers, total members"""
 
-    info = []
-    members = session.query(Member).order_by(Member.gear_score.desc()).all()
-    officers = session.query(Member).filter(Member.rank == 'Officer').count()
-    gear_scores = [u.gear_score for u in members]
-    average = np.average(gear_scores)
-    lowest = members[-1]
-    highest = members[0]
-    info.append(['Average', round(average,2)])
-    info.append(['Lowest', lowest.gear_score, lowest.fam_name, lowest.char_name])
-    info.append(['Higest', highest.gear_score, highest.fam_name, highest.char_name])
-    info.append(['Total Officers', officers])
-    info.append(['Total Members', len(members) - officers])
-    info.append(['Total', len(members)])
+    try:
+        info = []
+        members = session.query(Member).order_by(Member.gear_score.desc()).all()
+        officers = session.query(Member).filter(Member.rank == 'Officer').count()
+        gear_scores = [u.gear_score for u in members]
+        average = np.average(gear_scores)
+        lowest = members[-1]
+        highest = members[0]
+        info.append(['Average', round(average,2)])
+        info.append(['Lowest', lowest.gear_score, lowest.fam_name, lowest.char_name])
+        info.append(['Higest', highest.gear_score, highest.fam_name, highest.char_name])
+        info.append(['Total Officers', officers])
+        info.append(['Total Members', len(members) - officers])
+        info.append(['Total', len(members)])
+        data = tabulate(info)
 
-    await bot.say(tabulate(info))
-
+        await bot.say(codify(data))
+    except:
+        await bot.say("Could not retrieve info")
+        
 
 bot.run(token)
