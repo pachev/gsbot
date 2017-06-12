@@ -1,6 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 from sqlalchemy.ext.declarative import declarative_base
+import csv
 
 from configparser import ConfigParser  
 from tabulate import tabulate
@@ -18,8 +19,12 @@ import random
 #Connecting to the sqlite database that holds the user information
 #Note: The database table has already been populated
 engine = create_engine('sqlite:///gsbot.db', echo=False)
-
 Base = declarative_base()
+
+table_name='gs_bot'
+admin_user='Officers'
+
+
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -31,7 +36,7 @@ token = config.get('auth', 'token2')
 
 #this is where I declare the class for the ORM based on the original spreadsheet
 class Member(Base):
-    __tablename__ = 'gs_bot'
+    __tablename__ = table_name
     __table_args__ = {'sqlite_autoincrement': True}
     id = Column(Integer, primary_key=True, nullable=False)
     fam_name = Column(String)
@@ -46,11 +51,15 @@ class Member(Base):
     dp = Column(Integer)
     gear_score = Column(Integer)
 
+if not engine.dialect.has_table(engine, table_name):  # If table don't exist, Create.
+    Base.metadata.create_all(engine)
+
 
 description = '''
 This the official Gear Score bot of the Legendary Guild Sazerac.
 Made by drawven(drawven@gmail.com)
 '''
+
 bot = commands.Bot(command_prefix='gsbot ', description=description)
 
 headers = ['Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
@@ -69,10 +78,10 @@ async def on_ready():
 
 @bot.command(pass_context=True)
 async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_class):
-    """Adds yourself as a memberto the database. This member is linked with your discord name
-    and can only be updated by either that member or an officer. The command is as
+    """Adds yourself as a member to the database. This member is linked with your discord id
+    and can only be updated by either that member or an officer.
     example regular member: gsbot add drawven drawven 56 83 83 Musa 
-    Note: Total gear score is auto calculated"""
+    Note: Total gear score and rank is auto calculated."""
     date = datetime.now()
 
     author = ctx.message.author
@@ -80,7 +89,7 @@ async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_c
 
     roles = [u.name for u in author.roles]
 
-    if 'Admin' in roles:
+    if admin_user in roles:
         rank = 'Officer'
     else:
         rank = 'Member'
@@ -117,25 +126,29 @@ async def add(ctx,
               ap : int,
               dp: int,
               char_class,
-              user: discord.Member,
-              rank="Member"):
+              user: discord.Member,):
     """Officers only Adds a member to the database. 
     example : gsbot add drawven drawven 56 83 83 Musa @drawven#9405
-    Note: Total gear score is auto calculated"""
+    Note: Total gear score and rank is auto calculated"""
     date = datetime.now()
 
     author = ctx.message.author
     count = session.query(Member).filter(Member.discord == user.id).count()
 
     roles = [u.name for u in author.roles]
-    print([i.name for i in author.roles])
-    if 'Admin' not in roles:
+    if admin_user not in roles:
         await bot.say("Only officers may perorm this action")
     else:
         if count >= 1:
             await bot.say("Cannot add more than one character to this discord id")
         else:
             try:
+
+                user_roles = [u.name for u in user.roles]
+                if admin_user in user_roles:
+                    rank = 'Officer'
+                else:
+                    rank = 'Member'
                 member = Member(fam_name=fam_name, 
                                 char_name=char_name, 
                                 level= level,
@@ -191,7 +204,7 @@ async def update(ctx, level: int, ap: int, dp: int, user: discord.Member):
 
     roles = [u.name for u in author.roles]
     print([i.name for i in author.roles])
-    if 'Admin' not in roles:
+    if admin_user not in roles:
         await bot.say("Only officers may perorm this action")
     else:
         date = datetime.now()
@@ -224,7 +237,7 @@ async def delete(ctx, user: discord.Member):
 
     roles = [u.name for u in author.roles]
     print([i.name for i in author.roles])
-    if 'Admin' not in roles:
+    if admin_user not in roles:
         await bot.say("Only officers may perorm this action")
     else:
         try:
@@ -350,6 +363,17 @@ async def info():
         await bot.say(codify(data))
     except:
         await bot.say("Could not retrieve info")
+
+@bot.command()
+async def export():
+    """Exports current guild data"""
+
+    out = open('./members.csv', 'w')
+    out_csv = csv.writer(out)
+    members = session.query(Member).order_by(Member.gear_score.desc()).all()
+    [out_csv.writerow([getattr(curr, column.name) for column in Member.__mapper__.columns]) for curr in members]
+    out.close()
+    await bot.upload('./members.csv')
         
 
 bot.run(token)

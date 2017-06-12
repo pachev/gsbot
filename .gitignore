@@ -108,3 +108,4 @@ ENV/
 test.py
 config.ini
 .DS_Store
+./members.csv
