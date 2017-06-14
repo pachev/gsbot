@@ -68,6 +68,14 @@ headers = ['Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
 def codify(s):
     return '```\n' + s + '\n```'
 
+def paginate(data):
+    paginator = commands.Paginator()
+    for i in data.splitlines():
+        paginator.add_line(i)
+    return paginator.pages
+
+
+
 
 @bot.event
 async def on_ready():
@@ -80,7 +88,7 @@ async def on_ready():
 async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_class):
     """Adds yourself as a member to the database. This member is linked with your discord id
     and can only be updated by either that member or an officer.
-    example regular member: gsbot add drawven drawven 56 83 83 Musa 
+    Example regular member: gsbot add drawven drawven 56 83 83 Musa 
     Note: Total gear score and rank is auto calculated."""
     date = datetime.now()
 
@@ -137,7 +145,7 @@ async def add(ctx,
 
     roles = [u.name for u in author.roles]
     if admin_user not in roles:
-        await bot.say("Only officers may perorm this action")
+        await bot.say("Only officers may perform this action")
     else:
         if count >= 1:
             await bot.say("Cannot add more than one character to this discord id")
@@ -205,7 +213,7 @@ async def update(ctx, level: int, ap: int, dp: int, user: discord.Member):
     roles = [u.name for u in author.roles]
     print([i.name for i in author.roles])
     if admin_user not in roles:
-        await bot.say("Only officers may perorm this action")
+        await bot.say("Only officers may perform this action")
     else:
         date = datetime.now()
 
@@ -238,7 +246,7 @@ async def delete(ctx, user: discord.Member):
     roles = [u.name for u in author.roles]
     print([i.name for i in author.roles])
     if admin_user not in roles:
-        await bot.say("Only officers may perorm this action")
+        await bot.say("Only officers may perform this action")
     else:
         try:
             member = session.query(Member).filter(Member.discord == user.id).one()
@@ -268,9 +276,9 @@ async def delete_me(ctx):
 
 
 @bot.command()
-async def list(num=10):
+async def list(num=100):
     """List all the members and their gear score with optional limit. 
-    eg. ?list returns first 10 by default  and ?list 5 first 5 sorted by
+    Example. gsbot list returns first 100 by default  and gsbot list 5 first 5 sorted by
     gear score"""
     try:
         members = session.query(Member).order_by(Member.gear_score.desc()).all()
@@ -279,7 +287,9 @@ async def list(num=10):
         data = tabulate(rows,
                         headers,
                        'simple',)
-        await bot.say(codify(data))
+        
+        for page in paginate(data):
+            await bot.say(page)
     except:
         await bot.say("Something went horribly wrong")
 
@@ -294,8 +304,12 @@ async def over(num=350):
         data = tabulate(rows,
                         headers,
                        'simple',)
-        await bot.say(codify(data))
-    except:
+
+        for page in paginate(data):
+            await bot.say(page)
+
+    except Exception as e:
+        print(e)
         await bot.say("Something went horribly wrong")
 
 
@@ -308,7 +322,9 @@ async def under(num=350):
         data = tabulate(rows,
                         headers,
                        'simple',)
-        await bot.say(codify(data))
+
+        for page in paginate(data):
+            await bot.say(page)
     except:
         await bot.say("Something went horribly wrong")
 
@@ -324,8 +340,9 @@ async def lookup(name=""):
         data = tabulate(rows,
                         headers,
                        'simple',)
+        for page in paginate(data):
+            await bot.say(page)
 
-        await bot.say(codify(data))
     except:
         await bot.say("Something went horribly wrong")
 
@@ -337,8 +354,9 @@ async def average():
     members = session.query(Member).order_by(Member.gear_score.desc()).all()
     gear_scores = [u.gear_score for u in members]
     average = np.average(gear_scores)
-    print(average)
-    await bot.say(average)
+    msg = 'Average is : {}'.format(average)
+    
+    await bot.say(codify(msg))
 
 @bot.command()
 async def info():
@@ -354,7 +372,7 @@ async def info():
         highest = members[0]
         info.append(['Average', round(average,2)])
         info.append(['Lowest', lowest.gear_score, lowest.fam_name, lowest.char_name])
-        info.append(['Higest', highest.gear_score, highest.fam_name, highest.char_name])
+        info.append(['Highest', highest.gear_score, highest.fam_name, highest.char_name])
         info.append(['Total Officers', officers])
         info.append(['Total Members', len(members) - officers])
         info.append(['Total', len(members)])
@@ -370,7 +388,7 @@ async def export():
 
     out = open('./members.csv', 'w')
     out_csv = csv.writer(out)
-    members = session.query(Member).order_by(Member.gear_score.desc()).all()
+    members = session.query(Member).all()
     [out_csv.writerow([getattr(curr, column.name) for column in Member.__mapper__.columns]) for curr in members]
     out.close()
     await bot.upload('./members.csv')
