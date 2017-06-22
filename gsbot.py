@@ -62,11 +62,17 @@ Made by drawven(drawven@gmail.com)
 
 bot = commands.Bot(command_prefix='gsbot ', description=description)
 
-headers = ['Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
+headers = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
 
 #utility method to wrap string in codeblocks
 def codify(s):
     return '```\n' + s + '\n```'
+
+def get_row(members, filter, num=-1):
+    if filter:
+        return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members[:num]] 
+
+    return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members] 
 
 def paginate(data):
     paginator = commands.Paginator()
@@ -84,12 +90,26 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+@bot.event
+async def on_command_error(error, ctx):
+    if isinstance(error, commands.NoPrivateMessage):
+        await bot.send_message(ctx.message.author, 'This command cannot be used in private messages.')
+    elif isinstance(error, commands.DisabledCommand):
+        await bot.send_message(ctx.message.author, 'Sorry. This command is disabled and cannot be used.')
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await bot.send_message(ctx.message.channel, codify("Does not compute: try gsbot help or gsbot help <specific command>"))
+    elif isinstance(error, commands.CommandNotFound):
+        await bot.send_message(ctx.message.channel, codify("I don't know that command: try gsbot help"))
+
 @bot.command(pass_context=True)
 async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_class):
     """Adds yourself as a member to the database. This member is linked with your discord id
     and can only be updated by either that member or an officer.
     Example regular member: gsbot add drawven drawven 56 83 83 Musa 
     Note: Total gear score and rank is auto calculated."""
+
+    if fam_name is None:
+        await bot.say("Does not compute: Try `gsbot add_me <fam_name> <char_name>`")
     date = datetime.now()
 
     author = ctx.message.author
@@ -244,7 +264,6 @@ async def delete(ctx, user: discord.Member):
     count = session.query(Member).filter(Member.discord == user.id).count()
 
     roles = [u.name for u in author.roles]
-    print([i.name for i in author.roles])
     if admin_user not in roles:
         await bot.say("Only officers may perform this action")
     else:
@@ -256,7 +275,8 @@ async def delete(ctx, user: discord.Member):
 
             await bot.say(codify(tabulate(info)))
             
-        except:
+        except Exception as e:
+            print(e)
             await bot.say("Error deleting user")
 
 @bot.command(pass_context=True)
@@ -282,7 +302,7 @@ async def list(num=100):
     gear score"""
     try:
         members = session.query(Member).order_by(Member.gear_score.desc()).all()
-        rows = [[u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members[:num]] 
+        rows = get_row(members, True, num)
 
         data = tabulate(rows,
                         headers,
@@ -295,11 +315,11 @@ async def list(num=100):
 
 
 @bot.command()
-async def over(num=350):
+async def over(num=400):
     """List all the members over a certain gear score"""
     try:
-        members = session.query(Member).order_by(Member.gear_score.desc()).all()
-        rows =[[u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members if u.gear_score >= num]
+        members = session.query(Member).order_by(Member.gear_score.desc()).filter(Member.gear_score >= num).all()
+        rows = get_row(members,False)
 
         data = tabulate(rows,
                         headers,
@@ -314,11 +334,11 @@ async def over(num=350):
 
 
 @bot.command()
-async def under(num=350):
+async def under(num=400):
     """List all the members under a certain gear score"""
     try:
-        members = session.query(Member).order_by(Member.gear_score.desc()).all()
-        rows =[[u.fam_name, u.char_name,  u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members if u.gear_score <= num]
+        members = session.query(Member).order_by(Member.gear_score.desc()).filter(Member.gear_score <= num).all()
+        rows = get_row(members, False)
         data = tabulate(rows,
                         headers,
                        'simple',)
@@ -335,7 +355,7 @@ async def lookup(name=""):
     try:
         members = session.query(Member).filter(or_(Member.fam_name.ilike('%'+name+'%'),
                                                   Member.char_name.ilike('%'+name+'%'))).all()
-        rows =[[u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members]
+        rows = get_row(members, False)
 
         data = tabulate(rows,
                         headers,
@@ -375,7 +395,7 @@ async def info():
         info.append(['Highest', highest.gear_score, highest.fam_name, highest.char_name])
         info.append(['Total Officers', officers])
         info.append(['Total Members', len(members) - officers])
-        info.append(['Total', len(members)])
+        info.append(['Guild Total', len(members)])
         data = tabulate(info)
 
         await bot.say(codify(data))
@@ -389,9 +409,14 @@ async def export():
     out = open('./members.csv', 'w')
     out_csv = csv.writer(out)
     members = session.query(Member).all()
-    [out_csv.writerow([getattr(curr, column.name) for column in Member.__mapper__.columns]) for curr in members]
-    out.close()
-    await bot.upload('./members.csv')
+    try:
+        [out_csv.writerow([getattr(curr, column.name) for column in Member.__mapper__.columns]) for curr in members]
+        out.close()
+        await bot.upload('./members.csv')
+    except Exception as e:
+        print(e)
+        await bot.say("Something went horribly wrong")
+
         
 
 bot.run(token)

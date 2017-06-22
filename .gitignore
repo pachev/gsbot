@@ -109,3 +109,6 @@ test.py
 config.ini
 .DS_Store
 ./members.csv
+members.json
+members.csv
+gsbot.py.bak
