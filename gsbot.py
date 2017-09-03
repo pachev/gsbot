@@ -155,7 +155,7 @@ async def add(ctx,
               dp: int,
               char_class,
               user: discord.Member,):
-    """Officers only Adds a member to the database. 
+    """**Officers only** Adds a member to the database. 
     example : gsbot add drawven drawven 56 83 83 Musa @drawven#9405
     Note: Total gear score and rank is auto calculated"""
     date = datetime.now()
@@ -225,7 +225,7 @@ async def update_me(ctx, level: int, ap: int, dp: int):
 
 @bot.command(pass_context=True)
 async def update(ctx, level: int, ap: int, dp: int, user: discord.Member):
-    """ Officers Only Updates a users gear score Each user is linked to a gear score in the database
+    """ **Officers Only** Updates a users gear score Each user is linked to a gear score in the database
     and can only update their scores(excluding officers)."""
 
     author = ctx.message.author
@@ -257,27 +257,25 @@ async def update(ctx, level: int, ap: int, dp: int, user: discord.Member):
             await bot.say("Error updating user")
 
 @bot.command(pass_context=True)
-async def delete(ctx, user: discord.Member):
-    """Officers only Deletes an added character"""
+async def delete(ctx, fam_name):
+    """**Officers only** Deletes an added user by family name"""
 
     author = ctx.message.author
-    count = session.query(Member).filter(Member.discord == user.id).count()
-
     roles = [u.name for u in author.roles]
     if admin_user not in roles:
         await bot.say("Only officers may perform this action")
     else:
         try:
-            member = session.query(Member).filter(Member.discord == user.id).one()
+            member = session.query(Member).filter(Member.fam_name == fam_name).one()
             session.delete(member)
-            info = [["Success Deleting User"], ["Character", member.char_name], ["Discord", user.id]]
+            info = [["Success Deleting User"], ["Character", member.char_name], ["Family", member.fam_name]]
             session.commit()
 
             await bot.say(codify(tabulate(info)))
             
         except Exception as e:
             print(e)
-            await bot.say("Error deleting user")
+            await bot.say(codify("Error deleting user, Make sure the spelling is correct"))
 
 @bot.command(pass_context=True)
 async def delete_me(ctx):
@@ -417,6 +415,37 @@ async def export():
         print(e)
         await bot.say("Something went horribly wrong")
 
-        
+@bot.command(pass_context=True)
+async def reroll(ctx, new_char_name, level: int, ap : int, dp: int, new_char_class):
+    """Just for scatter: Allows you to reroll """
+
+    date = datetime.now()
+
+    author = ctx.message.author
+    user = session.query(Member).filter_by(discord=str(author.id)).first()
+
+    if not user:
+        await bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
+
+
+    else:
+        try:
+            user.char_name = new_char_name
+            user.ap = ap
+            user.dp = dp
+            user.char_class = new_char_class
+
+            session.commit()
+            info = [["Success Re-Rolling"], 
+                    ["New Char", new_char_name], 
+                    ["New GS", ap+dp], 
+                    ["New Class", new_char_class]]
+
+            await bot.say(codify(tabulate(info)))
+            
+        except Exception as e:
+            print(e)
+            await bot.say("Something went horribly wrong")
+
 
 bot.run(token)
