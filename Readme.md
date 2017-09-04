@@ -10,6 +10,11 @@ Black Desert Online. This specific bot is made for Sazerac guild but can be
 adjusted for use with any other guild.
 
 
+### Requirements
+- Python 3.6+
+- Mongodb
+- discord.py
+
 ## Installation
 
 
@@ -39,7 +44,7 @@ Then from the root of the project run:
 1. `pip install virtualenv` - Install virtualenv if not already done soCreate a virtual environment in the venv folder
 2. `virtualenv venv` - This creates will create a series of directories and scripts
 3. `venv/Scripts/activate` - Load the enviroment (There should be a (venv) before the current directory path name
-4. `pip install -r neatBackend/Requirements.txt` - Install dependencies
+4. `pip install -r requirements.txt` - Install dependencies
 5. `deactivate` - Unloads the environment
 
 ## Running
