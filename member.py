@@ -21,11 +21,4 @@ class Member(Document):
     progress = IntField()
     gear_pic = URLField()
     server = IntField()
-
     meta = {'collection' : collection}
-
-    @queryset_manager
-    def objects(doc_cls, queryset):
-        #Defines a default ordering for returning objects(gear score descending order)
-        return queryset.order_by('-gear_score')
-

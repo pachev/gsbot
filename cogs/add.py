@@ -1,13 +1,14 @@
 import discord
 from discord.ext import commands
 from tabulate import tabulate
+from datetime import datetime
 
 from member import Member
 from utils import *
 
 
 class Add:
-    """General commands."""
+    """Add commands."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -99,5 +100,39 @@ class Add:
                     
                 except:
                     await self.bot.say("Something went horribly wrong")
+
+    @commands.command(pass_context=True)
+    async def reroll(self, ctx, new_char_name, level: int, ap : int, dp: int, new_char_class):
+        """Just for scatter: Allows you to reroll """
+
+        author = ctx.message.author
+        user = Member.objects(discord = author).first()
+        date = datetime.now()
+        if not user:
+            await self.bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
+
+
+        else:
+            try:
+                user.char_name = new_char_name
+                user.ap = ap
+                user.dp = dp
+                user.gear_score = ap + dp
+                user.char_class = new_char_class
+                user.updated = date
+                user.save()
+
+                info = [["Success Re-Rolling"], 
+                        ["New Char", new_char_name], 
+                        ["New GS", ap+dp], 
+                        ["New Class", new_char_class]]
+
+                await self.bot.say(codify(tabulate(info)))
+                
+            except Exception as e:
+                print(e)
+                await self.bot.say("Something went horribly wrong")
+
+
 def setup(bot):
     bot.add_cog(Add(bot))

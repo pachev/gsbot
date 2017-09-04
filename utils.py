@@ -1,9 +1,8 @@
 from discord.ext import commands
 from configparser import ConfigParser
 
-#Config Parseer that reads basic information. This file must be supplied
-#For security reasons, it is not included in the repository, you will need
-#your own.
+#The inital config.ini must be supplied in order to retrieve
+#basic information
 config = ConfigParser()  
 config.read('config.ini')  
 
@@ -14,7 +13,13 @@ token = config.get('auth', 'token2')
 #User role that officer commands are checked against
 admin_user = 'Admin'
 
-initial_extensions = ('cogs.add',)
+initial_extensions = ('cogs.add', 
+                      'cogs.delete',
+                      'cogs.general',
+                      'cogs.listings', 
+                      'cogs.search', 
+                      'cogs.update')
+
 headers = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
 
 description = '''
@@ -28,9 +33,9 @@ def codify(s):
 
 def get_row(members, filter, num=-1):
     if filter:
-        return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members[:num]] 
+        return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated.strftime('%D')] for u in members[:num]] 
 
-    return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated] for u in members] 
+    return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated.strftime('%D')] for u in members] 
 
 def paginate(data):
     paginator = commands.Paginator()
