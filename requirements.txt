@@ -6,6 +6,7 @@ cffi==1.10.0
 chardet==3.0.3
 cycler==0.10.0
 discord.py==0.16.8
+mongoengine==0.13.0
 multidict==2.1.6
 numpy==1.12.1
 pycparser==2.17
@@ -15,6 +16,5 @@ pyparsing==2.2.0
 python-dateutil==2.6.0
 pytz==2017.2
 six==1.10.0
-SQLAlchemy==1.1.10
 tabulate==0.7.7
 websockets==3.3

@@ -1,6 +1,5 @@
-from sqlalchemy import *
-from sqlalchemy.orm import *
-from sqlalchemy.ext.declarative import declarative_base
+from pymongo import MongoClient
+from mongoengine import *
 import csv
 
 from configparser import ConfigParser  
@@ -16,43 +15,44 @@ from discord.ext import commands
 import random
 
 
-#Connecting to the sqlite database that holds the user information
-#Note: The database table has already been populated
-engine = create_engine('sqlite:///gsbot.db', echo=False)
-Base = declarative_base()
+db_name = 'gsbot'
 
-table_name='gs_bot'
-admin_user='Officers'
-
-
-Session = sessionmaker(bind=engine)
-session = Session()
 
 config = ConfigParser()  
 config.read('config.ini')  
 token = config.get('auth', 'token2') 
 
 
+collection ='sazerac'
+admin_user ='Admin'
 
-#this is where I declare the class for the ORM based on the original spreadsheet
-class Member(Base):
-    __tablename__ = table_name
-    __table_args__ = {'sqlite_autoincrement': True}
-    id = Column(Integer, primary_key=True, nullable=False)
-    fam_name = Column(String)
-    char_name = Column(String)
-    discord = Column(String)
-    notes = Column(String)
-    updated = Column(String)
-    char_class = Column(String)
-    rank = Column(String)
-    level = Column(Integer)
-    ap = Column(Integer)
-    dp = Column(Integer)
-    gear_score = Column(Integer)
 
-if not engine.dialect.has_table(engine, table_name):  # If table don't exist, Create.
-    Base.metadata.create_all(engine)
+connect(db_name)
+
+
+class Member(Document):
+    rank = StringField(max_lenght=50)
+    fam_name = StringField(max_lenght=50)
+    char_name = StringField(max_lenght=50)
+    char_class = StringField(max_lenght=50)
+    discord = IntField()
+    server = StringField()
+    level = IntField(max_lenght=4)
+    ap = IntField(max_lenght=5)
+    dp = IntField(max_lenght=5)
+    gear_score = IntField(max_lenght=10)
+    progress = IntField()
+    updated = DateTimeField(default=datetime.now)
+    gear_pic = URLField()
+    server = IntField()
+
+    meta = {'collection' : collection}
+
+    @queryset_manager
+    def objects(doc_cls, queryset):
+        # This may actually also be done by defining a default ordering for
+        # the document, but this illustrates the use of manager methods
+        return queryset.order_by('-gear_score')
 
 
 description = '''
@@ -80,7 +80,9 @@ def paginate(data):
         paginator.add_line(i)
     return paginator.pages
 
-
+#Here check for server configs and add a new collection for each server name
+def check_server_config():
+    pass
 
 
 @bot.event
@@ -89,6 +91,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    check_server_config()
 
 @bot.event
 async def on_command_error(error, ctx):
@@ -108,12 +111,7 @@ async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_c
     Example regular member: gsbot add drawven drawven 56 83 83 Musa 
     Note: Total gear score and rank is auto calculated."""
 
-    if fam_name is None:
-        await bot.say("Does not compute: Try `gsbot add_me <fam_name> <char_name>`")
-    date = datetime.now()
-
     author = ctx.message.author
-    count = session.query(Member).filter(Member.discord == ctx.message.author.id).count()
 
     roles = [u.name for u in author.roles]
 
@@ -122,8 +120,9 @@ async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_c
     else:
         rank = 'Member'
 
+    count = len(Member.objects(discord = author.id))
     if count >= 1:
-        await bot.say("Cannot add more than one character to this discord id")
+        await bot.say("Cannot add more than one character to this discord id. Try rerolling with gsbot reroll")
     else:
         try:
             member = Member(fam_name=fam_name, 
@@ -134,11 +133,8 @@ async def add_me(ctx, fam_name, char_name, level: int, ap : int, dp: int, char_c
                             char_class= char_class,
                             rank = rank,
                             gear_score = ap + dp,
-                            discord = ctx.message.author.id,
-                            notes = "",
-                            updated =  date.strftime("%D"))
-            session.add(member)
-            session.commit()
+                            discord = ctx.message.author.id)
+            member.save()
             info = [["Success Adding User"], ["Character", char_name], ["gear_score", ap+dp], ["Discord", ctx.message.author.id]]
 
             await bot.say(codify(tabulate(info)))
@@ -161,7 +157,7 @@ async def add(ctx,
     date = datetime.now()
 
     author = ctx.message.author
-    count = session.query(Member).filter(Member.discord == user.id).count()
+    count = len(Member.objects(discord = author.id))
 
     roles = [u.name for u in author.roles]
     if admin_user not in roles:
@@ -171,12 +167,12 @@ async def add(ctx,
             await bot.say("Cannot add more than one character to this discord id")
         else:
             try:
-
                 user_roles = [u.name for u in user.roles]
                 if admin_user in user_roles:
                     rank = 'Officer'
                 else:
                     rank = 'Member'
+
                 member = Member(fam_name=fam_name, 
                                 char_name=char_name, 
                                 level= level,
@@ -185,12 +181,9 @@ async def add(ctx,
                                 char_class= char_class,
                                 rank = rank,
                                 gear_score = ap + dp,
-                                discord = user.id,
-                                notes = "",
-                                updated =  date.strftime("%D"))
-                session.add(member)
-                session.commit()
-                info = [["Success Adding User"], ["Character", char_name], ["gear_score", ap+dp], ["Discord", user.id]]
+                                discord = user.id)
+                member.save()
+                info = [["Success Adding User"], ["Character", member.char_name], ["Gear Score", ap+dp], ["Discord", user.id]]
 
                 await bot.say(codify(tabulate(info)))
                 
@@ -205,17 +198,15 @@ async def update_me(ctx, level: int, ap: int, dp: int):
     date = datetime.now()
 
     try:
-        member = session.query(Member).filter(Member.discord == ctx.message.author.id).one()
+        member = Member.objects(discord = ctx.author.id).first()
         member.level = level
         member.ap = ap
         member.dp = dp
         member.gear_score = ap + dp
         member.updated = date.strftime("%D")
+        member.save()
 
-        session.add(member)
         info = [["Success updating User"], ["Character", member.char_name], ["gear_score", ap+dp], ["Discord", ctx.message.author.id]]
-
-        session.commit()
 
         await bot.say(codify(tabulate(info)))
         
@@ -231,24 +222,21 @@ async def update(ctx, level: int, ap: int, dp: int, user: discord.Member):
     author = ctx.message.author
 
     roles = [u.name for u in author.roles]
-    print([i.name for i in author.roles])
     if admin_user not in roles:
         await bot.say("Only officers may perform this action")
     else:
         date = datetime.now()
 
         try:
-            member = session.query(Member).filter(Member.discord == user.id).one()
+            member = Member.objects(discord = ctx.author.id).first()
             member.level = level
             member.ap = ap
             member.dp = dp
             member.gear_score = ap + dp
             member.updated = date.strftime("%D")
 
-            session.add(member)
+            member.save()
             info = [["Success updating User"], ["Character", member.char_name], ["gear_score", ap+dp], ["Discord", ctx.message.author.id]]
-
-            session.commit()
 
             await bot.say(codify(tabulate(info)))
             
@@ -266,10 +254,10 @@ async def delete(ctx, fam_name):
         await bot.say("Only officers may perform this action")
     else:
         try:
-            member = session.query(Member).filter(Member.fam_name == fam_name).one()
-            session.delete(member)
+            member = Member.objects(fam_name = fam_name).first()
+            member.delete()
+
             info = [["Success Deleting User"], ["Character", member.char_name], ["Family", member.fam_name]]
-            session.commit()
 
             await bot.say(codify(tabulate(info)))
             
@@ -282,10 +270,9 @@ async def delete_me(ctx):
     """Deletes your added character"""
 
     try:
-        member = session.query(Member).filter(Member.discord == ctx.message.author.id).one()
-        session.delete(member)
+        member = Member.objects(discord = ctx.author.id).first()
+        member.delete()
         info = [["Success Deleting User"], ["Character", member.char_name], ["Discord", ctx.message.author.id]]
-        session.commit()
 
         await bot.say(codify(tabulate(info)))
         
@@ -299,7 +286,7 @@ async def list(num=100):
     Example. gsbot list returns first 100 by default  and gsbot list 5 first 5 sorted by
     gear score"""
     try:
-        members = session.query(Member).order_by(Member.gear_score.desc()).all()
+        members = Member.objects()
         rows = get_row(members, True, num)
 
         data = tabulate(rows,
@@ -316,7 +303,7 @@ async def list(num=100):
 async def over(num=400):
     """List all the members over a certain gear score"""
     try:
-        members = session.query(Member).order_by(Member.gear_score.desc()).filter(Member.gear_score >= num).all()
+        members = Member.objects(gear_score__gte = num)
         rows = get_row(members,False)
 
         data = tabulate(rows,
@@ -335,7 +322,7 @@ async def over(num=400):
 async def under(num=400):
     """List all the members under a certain gear score"""
     try:
-        members = session.query(Member).order_by(Member.gear_score.desc()).filter(Member.gear_score <= num).all()
+        members = Member.objects(gear_score__lte = num)
         rows = get_row(members, False)
         data = tabulate(rows,
                         headers,
@@ -351,8 +338,7 @@ async def under(num=400):
 async def lookup(name=""):
     """Looks up a guild member by score"""
     try:
-        members = session.query(Member).filter(or_(Member.fam_name.ilike('%'+name+'%'),
-                                                  Member.char_name.ilike('%'+name+'%'))).all()
+        members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name))
         rows = get_row(members, False)
 
         data = tabulate(rows,
@@ -361,20 +347,9 @@ async def lookup(name=""):
         for page in paginate(data):
             await bot.say(page)
 
-    except:
+    except Exception as e:
+        print(e)
         await bot.say("Something went horribly wrong")
-
-
-@bot.command()
-async def average():
-    """Gives the current guild score average"""
-
-    members = session.query(Member).order_by(Member.gear_score.desc()).all()
-    gear_scores = [u.gear_score for u in members]
-    average = np.average(gear_scores)
-    msg = 'Average is : {}'.format(average)
-    
-    await bot.say(codify(msg))
 
 @bot.command()
 async def info():
@@ -382,34 +357,35 @@ async def info():
 
     try:
         info = []
-        members = session.query(Member).order_by(Member.gear_score.desc()).all()
-        officers = session.query(Member).filter(Member.rank == 'Officer').count()
-        gear_scores = [u.gear_score for u in members]
-        average = np.average(gear_scores)
-        lowest = members[-1]
+        members = Member.objects()
+        officers = Member.objects(rank=admin_user)
+        average = Member.objects.average('gear_score')
+        lowest = Member.objects.order_by('+gear_score').first()
         highest = members[0]
         info.append(['Average', round(average,2)])
         info.append(['Lowest', lowest.gear_score, lowest.fam_name, lowest.char_name])
         info.append(['Highest', highest.gear_score, highest.fam_name, highest.char_name])
-        info.append(['Total Officers', officers])
-        info.append(['Total Members', len(members) - officers])
+        info.append(['Total Officers', len(officers)])
+        info.append(['Total Members', len(members) - len(officers)])
         info.append(['Guild Total', len(members)])
         data = tabulate(info)
 
         await bot.say(codify(data))
-    except:
+    except Exception as e:
+        print(e)
         await bot.say("Could not retrieve info")
 
 @bot.command()
 async def export():
     """Exports current guild data"""
 
-    out = open('./members.csv', 'w')
-    out_csv = csv.writer(out)
-    members = session.query(Member).all()
+    members = Member.objects()
+    rows = get_row(members, False)
+    rows.insert(0, headers)
     try:
-        [out_csv.writerow([getattr(curr, column.name) for column in Member.__mapper__.columns]) for curr in members]
-        out.close()
+        with open('./members.csv', 'w') as myfile:
+            wr = csv.writer(myfile)
+            wr.writerows(rows)
         await bot.upload('./members.csv')
     except Exception as e:
         print(e)
@@ -419,11 +395,11 @@ async def export():
 async def reroll(ctx, new_char_name, level: int, ap : int, dp: int, new_char_class):
     """Just for scatter: Allows you to reroll """
 
+    user = Member.objects(discord = ctx.author.id).first()
+
     date = datetime.now()
 
     author = ctx.message.author
-    user = session.query(Member).filter_by(discord=str(author.id)).first()
-
     if not user:
         await bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
 
@@ -433,9 +409,10 @@ async def reroll(ctx, new_char_name, level: int, ap : int, dp: int, new_char_cla
             user.char_name = new_char_name
             user.ap = ap
             user.dp = dp
+            user.gear_score = ap + dp
             user.char_class = new_char_class
+            user.save()
 
-            session.commit()
             info = [["Success Re-Rolling"], 
                     ["New Char", new_char_name], 
                     ["New GS", ap+dp], 
@@ -446,6 +423,5 @@ async def reroll(ctx, new_char_name, level: int, ap : int, dp: int, new_char_cla
         except Exception as e:
             print(e)
             await bot.say("Something went horribly wrong")
-
 
 bot.run(token)
