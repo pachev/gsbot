@@ -19,6 +19,11 @@ class Delete:
 
         author = ctx.message.author
         roles = [u.name for u in author.roles]
+        print('starting')
+        try:
+            print(roles)
+        except Exception as e:
+            print(e)
         if admin_user not in roles:
             await self.bot.say("Only officers may perform this action")
         else:

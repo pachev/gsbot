@@ -112,3 +112,4 @@ config.ini
 members.json
 members.csv
 gsbot.py.bak
+.idea/

@@ -20,7 +20,7 @@ class General:
         try:
             info = []
             members = Member.objects()
-            officers = Member.objects(rank=admin_user)
+            officers = Member.objects(rank='Officer')
             average = Member.objects.average('gear_score')
             lowest = Member.objects.order_by('+gear_score').first()
             highest = members[0]

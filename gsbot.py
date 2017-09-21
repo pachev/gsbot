@@ -1,3 +1,4 @@
+import traceback
 from mongoengine import *
 import sys
 
