@@ -18,9 +18,10 @@ initial_extensions = ('cogs.add',
                       'cogs.general',
                       'cogs.listings', 
                       'cogs.search', 
-                      'cogs.update')
+                      'cogs.update',
+                      'cogs.extras')
 
-headers = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', 'AP', 'DP','GS', 'Updated']
+headers = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'DP','GS', 'Updated']
 
 description = '''
 This the official Gear Score bot of the Legendary Guild Sazerac.
@@ -33,9 +34,13 @@ def codify(s):
 
 def get_row(members, filter, num=-1):
     if filter:
-        return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated.strftime('%D')] for u in members[:num]] 
+        return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.progress, u.ap, u.dp,
+                 u.gear_score, u.updated.strftime('%D')]
+                for u in members[:num]]
 
-    return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.ap, u.dp, u.gear_score, u.updated.strftime('%D')] for u in members] 
+    return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.progress, u.ap, u.dp,
+             u.gear_score, u.updated.strftime('%D')]
+            for u in members]
 
 def paginate(data):
     paginator = commands.Paginator()

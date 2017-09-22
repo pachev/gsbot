@@ -14,7 +14,7 @@ class Update:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def update(self, ctx, level: int, ap: int, dp: int, fam_name=''):
+    async def update(self, ctx, level: int, ap: int, dp: int, progress: float, fam_name=''):
         """Updates a user's gear score. Each user is linked to a gear score in the database
         and can only update their scores. **Officers can add an additional family name at 
         the end of this command to update another user"""
@@ -29,11 +29,12 @@ class Update:
                 roles = [u.name for u in author.roles]
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")
-                    return
+
             member.level = level
             member.ap = ap
             member.dp = dp
             member.gear_score = ap + dp
+            member.progress = progress
             member.updated = date
             member.save()
 

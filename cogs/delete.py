@@ -14,36 +14,25 @@ class Delete:
 
 
     @commands.command(pass_context=True)
-    async def delete(self, ctx, fam_name):
-        """**Officers only** Deletes an added user by family name"""
-
-        author = ctx.message.author
-        roles = [u.name for u in author.roles]
-        if admin_user not in roles:
-            await self.bot.say("Only officers may perform this action")
-        else:
-            try:
-                member = Member.objects(fam_name = fam_name).first()
-                info = [["Success Deleting User"], ["Character", member.char_name], ["Family", member.fam_name]]
-                member.delete()
-                await self.bot.say(codify(tabulate(info)))
-            except Exception as e:
-                print(e)
-                await self.bot.say(codify("Error deleting user, Make sure the spelling is correct"))
-
-    @commands.command(pass_context=True)
-    async def delete_me(self, ctx):
-        """Deletes your added character"""
+    async def delete(self, ctx, fam_name=''):
+        """Deletes character from list. **officers can add an optional family name at the
+        end to delete a certain user"""
 
         try:
-            member = Member.objects(discord = ctx.message.author.id).first()
-            info = [["Success Deleting User"], ["Character", member.char_name], ["Discord", member.discord]]
+            author = ctx.message.author
+            if not fam_name:
+                member = Member.objects(discord = author.id).first()
+            else:
+                member = Member.objects(fam_name = fam_name).first()
+                roles = [u.name for u in author.roles]
+                if admin_user not in roles:
+                    await self.bot.say("Only officers may perform this action")
+            info = [["Success Deleting User"], ["Character", member.char_name], ["Family", member.fam_name]]
             member.delete()
             await self.bot.say(codify(tabulate(info)))
         except Exception as e:
             print(e)
-            await self.bot.say("Error deleting user")
-
+            await self.bot.say(codify("Error deleting user"))
 
 def setup(bot):
     bot.add_cog(Delete(bot))

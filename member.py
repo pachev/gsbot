@@ -18,8 +18,8 @@ class Member(Document):
     dp = IntField(max_lenght=5)
     gear_score = IntField(max_lenght=10)
     updated = DateTimeField(default=datetime.now)
-    progress = IntField()
-    gear_pic = URLField()
+    progress = FloatField(default=0.0)
+    gear_pic = URLField(default="https://i.imgur.com/UFViCXj.jpg")
     server = IntField()
     meta = {
         'collection' : collection,

@@ -22,15 +22,16 @@ class Add:
                   ap : int,
                   dp: int,
                   char_class,
-                  user: discord.user = None):
-        """Adds yourself as a member to the database. This member is linked with your discord id
-        and can only be updated by either that member or an officer.
+                  user: discord.User = None):
+        """Adds yourself as a member to the database. This member is linked with your
+        discord id and can only be updated by either that member or an officer.
+        **Officers can add a user by tagging them at the end. eg @drawven#8888**
         Note: Total gear score and rank is auto calculated."""
 
-        author = ctx.message.author
-        roles = [u.name for u in author.roles]
 
         try:
+            author = ctx.message.author
+            roles = [u.name for u in author.roles]
             member = Member(fam_name=fam_name,
                             char_name=char_name,
                             level= level,
@@ -46,9 +47,13 @@ class Add:
                 if count >= 1:
                     await self.bot.say("Cannot add more than one character to this discord id. Try rerolling with gsbot reroll")
             else:
-                user_roles = [u.name for u in user.roles]
+                try:
+                    user_roles = [u.name for u in user.roles]
+                    member.rank = 'Officer' if admin_user in user_roles else 'Member'
+                except Exception as e:
+                    member.rank = 'Member'
+                    print(e)
                 member.discord = user.id
-                member.rank = 'Officer' if admin_user in user_roles else 'Member'
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")
 

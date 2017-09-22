@@ -19,12 +19,15 @@ class Search:
         try:
             members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name))
             rows = get_row(members, False)
-
             data = tabulate(rows,
                             headers,
-                           'simple',)
-            for page in paginate(data):
-                await self.bot.say(page)
+                            'simple',)
+
+            if len(members) == 1:
+                await self.bot.say(codify(data) +"\n" + members.first().gear_pic)
+            else:
+                for page in paginate(data):
+                    await self.bot.say(page)
 
         except Exception as e:
             print(e)
