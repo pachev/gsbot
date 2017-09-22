@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from member import Member
+from models import Member, Historical
 from utils import *
 
 
@@ -72,20 +72,33 @@ class Add:
         """Just for someone special: Allows you to reroll """
 
         author = ctx.message.author.id
-        user = Member.objects(discord = author).first()
+        member = Member.objects(discord = author).first()
         date = datetime.now()
-        if not user:
+        if not member:
             await self.bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
 
         else:
             try:
-                user.char_name = new_char_name
-                user.ap = ap
-                user.dp = dp
-                user.gear_score = ap + dp
-                user.char_class = new_char_class
-                user.updated = date
-                user.save()
+                ## Adds historical data to todabase
+                update = Historical(
+                    type = "reroll",
+                    char_class = member.char_class,
+                    timestamp = date,
+                    level = member.level + (round(member.progress, 2) * .01),
+                    ap = member.ap,
+                    dp = member.dp,
+                    gear_score = member.gear_score
+                )
+                update.save()
+
+                member.char_name = new_char_name
+                member.ap = ap
+                member.dp = dp
+                member.gear_score = ap + dp
+                member.char_class = new_char_class
+                member.updated = date
+                member.hist_data.append(update)
+                member.save()
 
                 info = [["Success Re-Rolling"], 
                         ["New Char", new_char_name], 

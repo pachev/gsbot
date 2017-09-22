@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from member import Member
+from models import Member
 from utils import *
 
 
@@ -27,7 +27,7 @@ class Extras:
             await self.bot.say(codify("Picture added succesfully"))
         except Exception as e:
             print(e)
-            await self.bot.say("Something went horribly wrong")
+            await self.bot.say("Picture could not be added")
 
 def setup(bot):
     bot.add_cog(Extras(bot))

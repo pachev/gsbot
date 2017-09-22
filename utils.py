@@ -7,6 +7,7 @@ config = ConfigParser()
 config.read('config.ini')  
 
 collection = config.get('db', 'collection')
+hist_collection = config.get('db', 'historical')
 db_name = config.get('db', 'name')
 token = config.get('auth', 'token2') 
 

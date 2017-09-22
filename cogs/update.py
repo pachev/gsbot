@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from member import Member
+from models import Member, Historical
 from utils import *
 
 
@@ -30,12 +30,25 @@ class Update:
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")
 
+            ## Adds historical data to todabase
+            update = Historical(
+                type = "update",
+                char_class = member.char_class,
+                timestamp = date,
+                level = member.level + (round(member.progress, 2) * .01),
+                ap = member.ap,
+                dp = member.dp,
+                gear_score = member.gear_score
+            )
+            update.save()
+
             member.level = level
             member.ap = ap
             member.dp = dp
             member.gear_score = ap + dp
             member.progress = progress
             member.updated = date
+            member.hist_data.append(update)
             member.save()
 
             info = [["Success updating User"], ["Character", member.char_name], ["gear_score", ap+dp], ["Discord", author.id]]

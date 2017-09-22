@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 
-from member import Member
+from models import Member
 from utils import *
 
 class Listing:
@@ -26,8 +26,9 @@ class Listing:
             
             for page in paginate(data):
                 await self.bot.say(page)
-        except:
+        except Exception as e:
             await self.bot.say("Something went horribly wrong")
+            print(e)
 
 
     @commands.command()

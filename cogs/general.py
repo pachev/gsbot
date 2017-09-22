@@ -3,7 +3,7 @@ import csv
 from discord.ext import commands
 from tabulate import tabulate
 
-from member import Member
+from models import Member
 from utils import *
 
 
