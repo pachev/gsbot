@@ -27,19 +27,12 @@ class Add:
         and can only be updated by either that member or an officer.
         Note: Total gear score and rank is auto calculated."""
 
-
-        try:
-            print(ctx.message.author)
-            print(user.roles)
-        except Exception as e:
-            print(e)
-        author = ctx.author
+        author = ctx.message.author
         roles = [u.name for u in author.roles]
 
         try:
-            print('inside try')
-            member = Member(fam_name=fam_name, 
-                            char_name=char_name, 
+            member = Member(fam_name=fam_name,
+                            char_name=char_name,
                             level= level,
                             ap = ap,
                             dp = dp,
@@ -52,16 +45,15 @@ class Add:
                 count = len(Member.objects(discord = author.id))
                 if count >= 1:
                     await self.bot.say("Cannot add more than one character to this discord id. Try rerolling with gsbot reroll")
-                    return
             else:
                 user_roles = [u.name for u in user.roles]
                 member.discord = user.id
                 member.rank = 'Officer' if admin_user in user_roles else 'Member'
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")
-                    return
 
 
+            member.server = ctx.message.server.id
             member.save()
             info = [["Success Adding User"], ["Character", char_name], ["gear_score", ap+dp], ["Discord", ctx.message.author.id]]
             await self.bot.say(codify(tabulate(info)))
@@ -74,12 +66,11 @@ class Add:
     async def reroll(self, ctx, new_char_name, level: int, ap : int, dp: int, new_char_class):
         """Just for someone special: Allows you to reroll """
 
-        author = ctx.message.author
+        author = ctx.message.author.id
         user = Member.objects(discord = author).first()
         date = datetime.now()
         if not user:
             await self.bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
-
 
         else:
             try:

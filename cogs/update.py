@@ -41,8 +41,8 @@ class Update:
 
             await self.bot.say(codify(tabulate(info)))
             
-        except Error:
-            print(Error)
+        except Exception as e:
+            print(e)
             await self.bot.say("Error updating user")
 
 def setup(bot):

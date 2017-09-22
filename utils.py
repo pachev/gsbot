@@ -11,7 +11,7 @@ db_name = config.get('db', 'name')
 token = config.get('auth', 'token2') 
 
 #User role that officer commands are checked against
-admin_user = 'Admin'
+admin_user = 'Officers'
 
 initial_extensions = ('cogs.add', 
                       'cogs.delete',
