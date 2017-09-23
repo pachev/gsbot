@@ -12,7 +12,6 @@ class Delete:
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(pass_context=True)
     async def delete(self, ctx, fam_name=''):
         """Deletes character from list. **officers can add an optional family name at the
@@ -33,6 +32,7 @@ class Delete:
         except Exception as e:
             print(e)
             await self.bot.say(codify("Error deleting user"))
+
 
 def setup(bot):
     bot.add_cog(Delete(bot))

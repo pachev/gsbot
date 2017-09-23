@@ -43,7 +43,7 @@ class Add:
             if not user:
                 member.discord = author.id
                 member.rank = 'Officer' if admin_user in roles else 'Member'
-                count = len(Member.objects(discord = author.id))
+                count = Member.objects(discord = author.id).count()
                 if count >= 1:
                     await self.bot.say("Cannot add more than one character to this discord id. Try rerolling with gsbot reroll")
             else:

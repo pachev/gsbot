@@ -5,11 +5,11 @@ from tabulate import tabulate
 from models import Member
 from utils import *
 
+
 class Listing:
     """All the listing commands."""
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.command()
     async def list(self,num=100):
@@ -30,7 +30,6 @@ class Listing:
             await self.bot.say("Something went horribly wrong")
             print(e)
 
-
     @commands.command()
     async def over(self, num=400):
         """List all the members over a certain gear score"""
@@ -49,7 +48,6 @@ class Listing:
             print(e)
             await self.bot.say("Something went horribly wrong")
 
-
     @commands.command()
     async def under(self, num=400):
         """List all the members under a certain gear score"""
@@ -64,6 +62,7 @@ class Listing:
                 await self.bot.say(page)
         except:
             await self.bot.say("Something went horribly wrong")
+
 
 def setup(bot):
     bot.add_cog(Listing(bot))

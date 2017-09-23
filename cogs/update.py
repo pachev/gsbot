@@ -14,7 +14,7 @@ class Update:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def update(self, ctx, level: int, ap: int, dp: int, progress: float, fam_name=''):
+    async def update(self, ctx, level: int, ap: int, dp: int, level_percent: float, fam_name=''):
         """Updates a user's gear score. Each user is linked to a gear score in the database
         and can only update their scores. **Officers can add an additional family name at 
         the end of this command to update another user"""
@@ -30,7 +30,7 @@ class Update:
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")
 
-            ## Adds historical data to todabase
+            # Adds historical data to database
             update = Historical(
                 type = "update",
                 char_class = member.char_class,
@@ -46,7 +46,7 @@ class Update:
             member.ap = ap
             member.dp = dp
             member.gear_score = ap + dp
-            member.progress = progress
+            member.progress = level_percent
             member.updated = date
             member.hist_data.append(update)
             member.save()
@@ -58,6 +58,7 @@ class Update:
         except Exception as e:
             print(e)
             await self.bot.say("Error updating user")
+
 
 def setup(bot):
     bot.add_cog(Update(bot))

@@ -2,7 +2,7 @@ import traceback
 from mongoengine import *
 import sys
 
-from configparser import ConfigParser  
+from configparser import ConfigParser
 from tabulate import tabulate
 from datetime import datetime
 
@@ -14,14 +14,10 @@ from utils import *
 from models import Member
 
 
-#Main connection function offered by mongoengine defaults are localhost:27017
+# Main connection function offered by mongoengine defaults are localhost:27017
 connect(db_name)
 
 bot = commands.Bot(command_prefix='gsbot ', description=description)
-
-#Here check for server configs and add a new collection for each server name
-def check_server_config():
-    pass
 
 
 @bot.event
@@ -30,7 +26,6 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    check_server_config()
     # Here we load our extensions listed above in [initial_extensions].
     if __name__ == '__main__':
         for extension in initial_extensions:
@@ -41,6 +36,7 @@ async def on_ready():
                 print(f'Failed to load extension {extension}.', file=sys.stderr)
                 traceback.print_exc()
 
+
 @bot.event
 async def on_command_error(error, ctx):
     if isinstance(error, commands.NoPrivateMessage):
@@ -48,7 +44,8 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.DisabledCommand):
         await bot.send_message(ctx.message.author, 'Sorry. This command is disabled and cannot be used.')
     elif isinstance(error, commands.MissingRequiredArgument):
-        await bot.send_message(ctx.message.channel, codify("Does not compute: try gsbot help or gsbot help <specific command>"))
+        command = ctx.message.content.split()[1]
+        await bot.send_message(ctx.message.channel, "Missing an argument: try gsbot help or gsbot help " + command)
     elif isinstance(error, commands.CommandNotFound):
         await bot.send_message(ctx.message.channel, codify("I don't know that command: try gsbot help"))
 

@@ -4,8 +4,8 @@ from configparser import ConfigParser
 from utils import collection, hist_collection
 
 
-#These classes are ORMs provided by mongoengine. It's a cleaner way of
-#adding and deleting data throughout the bot
+# These classes are ORMs provided by mongoengine. It's a cleaner way of
+# adding and deleting data throughout the bot
 
 class Historical(Document):
     type = StringField(max_lenght=50)
@@ -18,7 +18,6 @@ class Historical(Document):
     meta = {
         'collection' : hist_collection,
     }
-
 
 
 class Member(Document):
@@ -40,8 +39,9 @@ class Member(Document):
     meta = {
         'collection' : collection,
     }
+
     @queryset_manager
     def objects(doc_cls, queryset):
-        #default order is gear score descending
+        # default order is gear score descending
         return queryset.order_by('-gear_score')
 

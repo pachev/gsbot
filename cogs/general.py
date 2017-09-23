@@ -15,7 +15,8 @@ class General:
 
     @commands.command()
     async def info(self):
-        """List important gear score info. Lowest, highest, average, newest(not yet), oldest, total users, total officers, total members"""
+        """List important gear score info. Lowest, highest, average, newest(not yet), oldest,
+        total users, total officers, total members"""
 
         try:
             info = []
@@ -24,12 +25,15 @@ class General:
             average = Member.objects.average('gear_score')
             lowest = Member.objects.order_by('+gear_score').first()
             highest = members[0]
+            count = members.count
+            officer_count = officers.count()
+            member_count = count - officer_count
             info.append(['Average', round(average,2)])
             info.append(['Lowest', lowest.gear_score, lowest.fam_name, lowest.char_name])
             info.append(['Highest', highest.gear_score, highest.fam_name, highest.char_name])
-            info.append(['Total Officers', len(officers)])
-            info.append(['Total Members', len(members) - len(officers)])
-            info.append(['Guild Total', len(members)])
+            info.append(['Total Officers', officer_count])
+            info.append(['Total Members', member_count])
+            info.append(['Guild Total', count])
             data = tabulate(info)
 
             await self.bot.say(codify(data))
@@ -52,8 +56,6 @@ class General:
         except Exception as e:
             print(e)
             await self.bot.say("Something went horribly wrong")
-
-
 
 
 def setup(bot):

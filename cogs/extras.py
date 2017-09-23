@@ -29,5 +29,6 @@ class Extras:
             print(e)
             await self.bot.say("Picture could not be added")
 
+
 def setup(bot):
     bot.add_cog(Extras(bot))

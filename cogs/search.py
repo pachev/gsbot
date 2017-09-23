@@ -23,7 +23,7 @@ class Search:
                             headers,
                             'simple',)
 
-            if len(members) == 1:
+            if members.count() == 1:
                 await self.bot.say(codify(data) +"\n" + members.first().gear_pic)
             else:
                 for page in paginate(data):
@@ -35,17 +35,21 @@ class Search:
 
     @commands.command()
     async def class_search(self, char_class=""):
-        """Looks up a guild members by class"""
+        """Looks up guild members by class"""
         try:
 
             if char_class.lower() == "dk":
-                members = Member.objects(Q(char_class__iexact = char_class) | Q(char_class__iexact = "dark") | Q(char_class__iexact = "dark knight") )
+                members = Member.objects(Q(char_class__iexact = char_class)
+                                         | Q(char_class__iexact = "dark")
+                                         | Q(char_class__iexact = "darkknight")
+                                         | Q(char_class__iexact = "dark knight"))
             elif char_class.lower() == "sorc":
-                members = Member.objects(Q(char_class__iexact = char_class) | Q(char_class__iexact = "sorceress"))
+                members = Member.objects(Q(char_class__iexact = char_class)
+                                         | Q(char_class__iexact = "sorceress"))
             else:
                 members = Member.objects(Q(char_class__iexact = char_class))
 
-            count = len(members)
+            count = members.count()
             rows = get_row(members, False)
 
             data = tabulate(rows,
