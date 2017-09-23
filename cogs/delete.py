@@ -22,7 +22,7 @@ class Delete:
             if not fam_name:
                 member = Member.objects(discord = author.id).first()
             else:
-                member = Member.objects(fam_name = fam_name).first()
+                member = Member.objects(fam_name = fam_name)(server=ctx.message.server.id).first()
                 roles = [u.name for u in author.roles]
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")

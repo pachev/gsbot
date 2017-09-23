@@ -25,7 +25,7 @@ class Add:
                   user: discord.User = None):
         """Adds yourself as a member to the database. This member is linked with your
         discord id and can only be updated by either that member or an officer.
-        **Officers can add a user by tagging them at the end. eg @drawven#8888**
+        **Officers can add a user by tagging them at the end. eg @drawven**
         Note: Total gear score and rank is auto calculated."""
 
 
@@ -45,7 +45,8 @@ class Add:
                 member.rank = 'Officer' if admin_user in roles else 'Member'
                 count = Member.objects(discord = author.id).count()
                 if count >= 1:
-                    await self.bot.say("Cannot add more than one character to this discord id. Try rerolling with gsbot reroll")
+                    await self.bot.say(codify("Cannot add more than one character to this discord id. "
+                                       "Try rerolling with gsbot reroll"))
             else:
                 try:
                     user_roles = [u.name for u in user.roles]
@@ -55,13 +56,17 @@ class Add:
                     print(e)
                 member.discord = user.id
                 if admin_user not in roles:
-                    await self.bot.say("Only officers may perform this action")
-
+                    await self.bot.say(codify("Only officers may perform this action"))
 
             member.server = ctx.message.server.id
             member.save()
-            info = [["Success Adding User"], ["Character", char_name], ["gear_score", ap+dp], ["Discord", ctx.message.author.id]]
-            await self.bot.say(codify(tabulate(info)))
+
+            row = get_row([member], False)
+            data = tabulate(row,
+                            headers,
+                            'simple',)
+
+            await self.bot.say(codify("Success Adding User\n\n" + data))
 
         except Exception as e:
             print(e)
@@ -94,22 +99,23 @@ class Add:
                 member.char_name = new_char_name
                 member.ap = ap
                 member.dp = dp
+                member.level = level
                 member.gear_score = ap + dp
                 member.char_class = new_char_class
                 member.updated = date
                 member.hist_data.append(update)
                 member.save()
 
-                info = [["Success Re-Rolling"], 
-                        ["New Char", new_char_name], 
-                        ["New GS", ap+dp], 
-                        ["New Class", new_char_class]]
+                row = get_row([member], False)
+                data = tabulate(row,
+                                headers,
+                                'simple',)
 
-                await self.bot.say(codify(tabulate(info)))
+                await self.bot.say(codify("Success Rerolling\n\n" + data))
 
             except Exception as e:
                 print(e)
-                await self.bot.say("Something went horribly wrong")
+                await self.bot.say("Could not reroll")
 
 
 def setup(bot):

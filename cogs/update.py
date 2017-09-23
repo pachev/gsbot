@@ -51,10 +51,13 @@ class Update:
             member.hist_data.append(update)
             member.save()
 
-            info = [["Success updating User"], ["Character", member.char_name], ["gear_score", ap+dp], ["Discord", author.id]]
+            row = get_row([member], False)
+            data = tabulate(row,
+                            headers,
+                            'simple',)
 
-            await self.bot.say(codify(tabulate(info)))
-            
+            await self.bot.say(codify(data))
+
         except Exception as e:
             print(e)
             await self.bot.say("Error updating user")

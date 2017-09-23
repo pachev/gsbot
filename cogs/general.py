@@ -13,19 +13,19 @@ class General:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def info(self):
+    @commands.command(pass_context=True)
+    async def info(self, ctx):
         """List important gear score info. Lowest, highest, average, newest(not yet), oldest,
         total users, total officers, total members"""
 
         try:
             info = []
-            members = Member.objects()
-            officers = Member.objects(rank='Officer')
-            average = Member.objects.average('gear_score')
-            lowest = Member.objects.order_by('+gear_score').first()
+            members = Member.objects(server=ctx.message.server.id)
+            officers = members(rank='Officer')
+            average = members.average('gear_score')
+            lowest = members.order_by('+gear_score').first()
             highest = members[0]
-            count = members.count
+            count = members.count()
             officer_count = officers.count()
             member_count = count - officer_count
             info.append(['Average', round(average,2)])

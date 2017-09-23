@@ -24,7 +24,7 @@ class Extras:
             member = Member.objects(discord = author.id).first()
             member.gear_pic = url
             member.save()
-            await self.bot.say(codify("Picture added succesfully"))
+            await self.bot.say(codify("Picture added successfully"))
         except Exception as e:
             print(e)
             await self.bot.say("Picture could not be added")

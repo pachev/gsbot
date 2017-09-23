@@ -13,9 +13,9 @@ class Search:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def lookup(self, name=""):
-        """Looks up a guild member by score"""
+    @commands.command(pass_context=True)
+    async def lookup(self, ctx, name=""):
+        """Looks up a guild member by family name or character name"""
         try:
             members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name))
             rows = get_row(members, False)
@@ -33,29 +33,30 @@ class Search:
             print(e)
             await self.bot.say("Something went horribly wrong")
 
-    @commands.command()
-    async def class_search(self, char_class=""):
+    @commands.command(pass_context=True)
+    async def class_search(self, ctx, char_class=""):
         """Looks up guild members by class"""
         try:
 
             if char_class.lower() == "dk":
-                members = Member.objects(Q(char_class__iexact = char_class)
+                all_members = Member.objects(Q(char_class__iexact = char_class)
                                          | Q(char_class__iexact = "dark")
                                          | Q(char_class__iexact = "darkknight")
                                          | Q(char_class__iexact = "dark knight"))
             elif char_class.lower() == "sorc":
-                members = Member.objects(Q(char_class__iexact = char_class)
+                all_members = Member.objects(Q(char_class__iexact = char_class)
                                          | Q(char_class__iexact = "sorceress"))
             else:
-                members = Member.objects(Q(char_class__iexact = char_class))
+                all_members = Member.objects(char_class__iexact = char_class)
 
+            members = all_members(server=ctx.message.server.id)
             count = members.count()
             rows = get_row(members, False)
 
             data = tabulate(rows,
                             headers,
                             'simple',)
-            for page in paginate("Total Number of " + char_class + ": " + str(count) + "\n\n" + data):
+            for page in paginate("Total Number of " + char_class + "on this server: " + str(count) + "\n\n" + data):
                 await self.bot.say(page)
 
         except Exception as e:
