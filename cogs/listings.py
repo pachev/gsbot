@@ -17,7 +17,7 @@ class Listing:
         Example. gsbot list returns first 100 by default  and gsbot list 5 first 5 sorted by
         gear score"""
         try:
-            members = Member.objects(server=ctx.message.server.id)
+            members = Member.objects()
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
@@ -34,7 +34,7 @@ class Listing:
     async def over(self, ctx, num=400):
         """List all the members over a certain gear score"""
         try:
-            members = Member.objects(gear_score__gte = num)(server=ctx.message.server.id)
+            members = Member.objects(gear_score__gte = num)
             rows = get_row(members,False)
 
             data = tabulate(rows,
@@ -52,7 +52,7 @@ class Listing:
     async def under(self, ctx, num=400):
         """List all the members under a certain gear score"""
         try:
-            members = Member.objects(gear_score__lte = num)(server=ctx.message.server.id)
+            members = Member.objects(gear_score__lte = num)
             rows = get_row(members, False)
             data = tabulate(rows,
                             headers,

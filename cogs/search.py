@@ -39,17 +39,16 @@ class Search:
         try:
 
             if char_class.lower() == "dk":
-                all_members = Member.objects(Q(char_class__iexact = char_class)
+                members = Member.objects(Q(char_class__iexact = char_class)
                                          | Q(char_class__iexact = "dark")
                                          | Q(char_class__iexact = "darkknight")
                                          | Q(char_class__iexact = "dark knight"))
             elif char_class.lower() == "sorc":
-                all_members = Member.objects(Q(char_class__iexact = char_class)
+                members = Member.objects(Q(char_class__iexact = char_class)
                                          | Q(char_class__iexact = "sorceress"))
             else:
-                all_members = Member.objects(char_class__iexact = char_class)
+                members = Member.objects(char_class__iexact = char_class)
 
-            members = all_members(server=ctx.message.server.id)
             count = members.count()
             rows = get_row(members, False)
 

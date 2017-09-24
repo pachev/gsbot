@@ -29,6 +29,7 @@ class Update:
                 roles = [u.name for u in author.roles]
                 if admin_user not in roles:
                     await self.bot.say("Only officers may perform this action")
+                    return
 
             # Adds historical data to database
             update = Historical(

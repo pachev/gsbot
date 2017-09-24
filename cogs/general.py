@@ -20,7 +20,7 @@ class General:
 
         try:
             info = []
-            members = Member.objects(server=ctx.message.server.id)
+            members = Member.objects()
             officers = members(rank='Officer')
             average = members.average('gear_score')
             lowest = members.order_by('+gear_score').first()

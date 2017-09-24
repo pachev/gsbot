@@ -47,6 +47,7 @@ class Add:
                 if count >= 1:
                     await self.bot.say(codify("Cannot add more than one character to this discord id. "
                                        "Try rerolling with gsbot reroll"))
+                    return
             else:
                 try:
                     user_roles = [u.name for u in user.roles]
@@ -57,6 +58,7 @@ class Add:
                 member.discord = user.id
                 if admin_user not in roles:
                     await self.bot.say(codify("Only officers may perform this action"))
+                    return
 
             member.server = ctx.message.server.id
             member.save()
@@ -81,6 +83,7 @@ class Add:
         date = datetime.now()
         if not member:
             await self.bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
+            return
 
         else:
             try:
