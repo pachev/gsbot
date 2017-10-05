@@ -9,6 +9,8 @@ config.read('config.ini')
 collection = config.get('db', 'collection')
 hist_collection = config.get('db', 'historical')
 db_name = config.get('db', 'name')
+db_user = config.get('auth', 'user')
+db_pass = config.get('auth', 'pwd')
 token = config.get('auth', 'token2') 
 
 # User role that officer commands are checked against
