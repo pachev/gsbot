@@ -15,7 +15,10 @@ from models import Member
 
 
 # Main connection function offered by mongoengine defaults are localhost:27017
-connect(db_name, username=db_user, password=db_pass)
+connect(db_name,
+        username=db_user,
+        password=db_pass,
+        authentication_source=db_name)
 
 bot = commands.Bot(command_prefix='gsbot ', description=description)
 
