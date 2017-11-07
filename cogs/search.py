@@ -55,7 +55,7 @@ class Search:
             data = tabulate(rows,
                             headers,
                             'simple',)
-            for page in paginate("Total Number of " + char_class + "on this server: " + str(count) + "\n\n" + data):
+            for page in paginate("Total Number of " + char_class + " on this server: " + str(count) + "\n\n" + data):
                 await self.bot.say(page)
 
         except Exception as e:

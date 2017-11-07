@@ -11,7 +11,7 @@ hist_collection = config.get('db', 'historical')
 db_name = config.get('db', 'name')
 db_user = config.get('auth', 'user')
 db_pass = config.get('auth', 'pwd')
-token = config.get('auth', 'token2') 
+token = config.get('auth', 'dev_token')
 
 # User role that officer commands are checked against
 admin_user = 'Officers'
