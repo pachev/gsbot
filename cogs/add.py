@@ -42,7 +42,7 @@ class Add:
 
             if not user:
                 member.discord = author.id
-                member.rank = 'Officer' if admin_user in roles else 'Member'
+                member.rank = 'Officer' if ADMIN_USER in roles else 'Member'
                 count = Member.objects(discord = author.id).count()
                 if count >= 1:
                     await self.bot.say(codify("Cannot add more than one character to this discord id. "
@@ -51,12 +51,12 @@ class Add:
             else:
                 try:
                     user_roles = [u.name for u in user.roles]
-                    member.rank = 'Officer' if admin_user in user_roles else 'Member'
+                    member.rank = 'Officer' if ADMIN_USER in user_roles else 'Member'
                 except Exception as e:
                     member.rank = 'Member'
                     print(e)
                 member.discord = user.id
-                if admin_user not in roles:
+                if ADMIN_USER not in roles:
                     await self.bot.say(codify("Only officers may perform this action"))
                     return
 
@@ -65,7 +65,7 @@ class Add:
 
             row = get_row([member], False)
             data = tabulate(row,
-                            headers,
+                            HEADERS,
                             'simple',)
 
             await self.bot.say(codify("Success Adding User\n\n" + data))
@@ -111,7 +111,7 @@ class Add:
 
                 row = get_row([member], False)
                 data = tabulate(row,
-                                headers,
+                                HEADERS,
                                 'simple',)
 
                 await self.bot.say(codify("Success Rerolling\n\n" + data))

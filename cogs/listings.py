@@ -17,11 +17,13 @@ class Listing:
         Example. gsbot list returns first 100 by default  and gsbot list 5 first 5 sorted by
         gear score"""
         try:
-            members = Member.objects()
+            print('server,', ctx.message.server.id)
+            members = Member.objects(server=ctx.message.server.id)
+            print(Member.objects().first().server)
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                            'simple',)
             
             for page in paginate(data):
@@ -34,11 +36,11 @@ class Listing:
     async def over(self, ctx, num=400):
         """List all the members over a certain gear score"""
         try:
-            members = Member.objects(gear_score__gte = num)
+            members = Member.objects(gear_score__gte = num, server = ctx.message.server.id)
             rows = get_row(members,False)
 
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                            'simple',)
 
             for page in paginate(data):
@@ -52,10 +54,10 @@ class Listing:
     async def under(self, ctx, num=400):
         """List all the members under a certain gear score"""
         try:
-            members = Member.objects(gear_score__lte = num)
+            members = Member.objects(gear_score__lte = num, server = ctx.message.server.id)
             rows = get_row(members, False)
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                            'simple',)
 
             for page in paginate(data):
@@ -71,15 +73,15 @@ class Listing:
         if ctx.invoked_subcommand is None:
             await self.bot.say(codify("Sort by any category available(lvl, ap, dp, gs). Try gsbot help sort_by"))
 
-    @sort_by.command()
-    async def lvl(self, num=100):
+    @sort_by.command(pass_context=True)
+    async def lvl(self, ctx, num=100):
         """ - Sorts list by level and progress with optional limiter"""
         try:
-            members = Member.objects().order_by('-level', '-progress')
+            members = Member.objects(server = ctx.message.server.id).order_by('-level', '-progress')
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                             'simple',)
 
             for page in paginate(data):
@@ -88,15 +90,15 @@ class Listing:
             await self.bot.say("Could not retrieve list")
             print(e)
 
-    @sort_by.command()
-    async def ap(self, num=100):
+    @sort_by.command(pass_context=True)
+    async def ap(self, ctx, num=100):
         """ - Sorts list by AP with optional limit"""
         try:
-            members = Member.objects().order_by('-ap')
+            members = Member.objects(server=ctx.message.server.id).order_by('-ap')
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                             'simple',)
 
             for page in paginate(data):
@@ -105,15 +107,15 @@ class Listing:
             await self.bot.say("Could not retrieve list")
             print(e)
 
-    @sort_by.command()
-    async def dp(self, num=100):
+    @sort_by.command(pass_context=True)
+    async def dp(self, ctx, num=100):
         """ - Sorts list by DP with optional limit"""
         try:
-            members = Member.objects().order_by('-dp')
+            members = Member.objects(server=ctx.message.server.id).order_by('-dp')
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                             'simple',)
 
             for page in paginate(data):

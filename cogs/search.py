@@ -17,10 +17,11 @@ class Search:
     async def lookup(self, ctx, name=""):
         """Looks up a guild member by family name or character name"""
         try:
-            members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name))
+            members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name),
+                                     server = ctx.message.server.id)
             rows = get_row(members, False)
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                             'simple',)
 
             if members.count() == 1:
@@ -49,11 +50,11 @@ class Search:
             else:
                 members = Member.objects(char_class__iexact = char_class)
 
-            count = members.count()
-            rows = get_row(members, False)
+            count = members(server = ctx.message.server.id).count()
+            rows = get_row(members(server = ctx.message.server.id), False)
 
             data = tabulate(rows,
-                            headers,
+                            HEADERS,
                             'simple',)
             for page in paginate("Total Number of " + char_class + " on this server: " + str(count) + "\n\n" + data):
                 await self.bot.say(page)

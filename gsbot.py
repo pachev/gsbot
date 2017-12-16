@@ -15,12 +15,12 @@ from models import Member
 
 
 # Main connection function offered by mongoengine defaults are localhost:27017
-connect(db_name,
-        username=db_user,
-        password=db_pass,
-        authentication_source=db_name)
+connect(DB_NAME,
+        username=DB_USER,
+        password=DB_PASS,
+        authentication_source=DB_NAME)
 
-bot = commands.Bot(command_prefix='gsbot ', description=description)
+bot = commands.Bot(command_prefix='gsbot ', description=DESCRIPTION)
 
 
 @bot.event
@@ -31,7 +31,7 @@ async def on_ready():
     print('------')
     # Here we load our extensions listed above in [initial_extensions].
     if __name__ == '__main__':
-        for extension in initial_extensions:
+        for extension in INITIAL_EXTENSIONS:
             try:
                 bot.load_extension(extension)
                 print('loaded {}'.format(extension))
@@ -52,4 +52,4 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.CommandNotFound):
         await bot.send_message(ctx.message.channel, codify("I don't know that command: try gsbot help"))
 
-bot.run(token)
+bot.run(TOKEN)

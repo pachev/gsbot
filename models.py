@@ -1,7 +1,7 @@
 from mongoengine import *
 from datetime import datetime
 from configparser import ConfigParser  
-from utils import collection, hist_collection
+from utils import COLLECTION, HIST_COLLECTION
 
 
 # These classes are ORMs provided by mongoengine. It's a cleaner way of
@@ -16,7 +16,7 @@ class Historical(Document):
     dp = IntField(max_lenght=5)
     gear_score = IntField(max_lenght=10)
     meta = {
-        'collection' : hist_collection,
+        'collection' : HIST_COLLECTION,
     }
 
 
@@ -37,7 +37,7 @@ class Member(Document):
     server = IntField()
     hist_data = ListField(ReferenceField(Historical))
     meta = {
-        'collection' : collection,
+        'collection' : COLLECTION,
     }
 
     @queryset_manager

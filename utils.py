@@ -3,31 +3,31 @@ from configparser import ConfigParser
 
 # The inital config.ini must be supplied in order to retrieve
 # basic information
-config = ConfigParser()  
-config.read('config.ini')
+CONFIG = ConfigParser()
+CONFIG.read('config.ini')
 
-collection = config.get('db', 'collection')
-hist_collection = config.get('db', 'historical')
-db_name = config.get('db', 'name')
-db_user = config.get('auth', 'user')
-db_pass = config.get('auth', 'pwd')
-token = config.get('auth', 'dev_token')
+COLLECTION = CONFIG.get('db', 'collection')
+HIST_COLLECTION = CONFIG.get('db', 'historical')
+DB_NAME = CONFIG.get('db', 'name')
+DB_USER = CONFIG.get('auth', 'user')
+DB_PASS = CONFIG.get('auth', 'pwd')
+TOKEN = CONFIG.get('auth', 'dev_token')
 
 # User role that officer commands are checked against
-admin_user = 'Officers'
+ADMIN_USER = 'Officers'
 
-initial_extensions = ('cogs.add', 
+INITIAL_EXTENSIONS = ('cogs.add',
                       'cogs.delete',
                       'cogs.general',
-                      'cogs.listings', 
-                      'cogs.search', 
+                      'cogs.listings',
+                      'cogs.search',
                       'cogs.update',
                       'cogs.extras')
 
-headers = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'DP','GS', 'Updated']
+HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'DP', 'GS', 'Updated']
 
-description = '''
-This the official Gear Score bot of the Legendary Guild Sazerac.
+DESCRIPTION = '''
+This the official Gear Score bot. 
 Made by drawven(drawven@gmail.com)
 '''
 
@@ -53,5 +53,3 @@ def paginate(data):
     for i in data.splitlines():
         paginator.add_line(i)
     return paginator.pages
-
-
