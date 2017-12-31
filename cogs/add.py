@@ -3,15 +3,37 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from models import Member, Historical
+from models.member import Member
+from models.historical import Historical
 from utils import *
-
 
 class Add:
     """Add commands."""
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def __get_rank_and_discord_id(self, author, user, roles):
+        if not user:
+            discord_id = author.id
+            rank = 'Officer' if ADMIN_USER in roles else 'Member'
+            if Member.objects(discord = author.id).count() >= 1:
+                await self.bot.say(codify("Cannot add more than one character to this discord id. "
+                                    "Try rerolling with gsbot reroll"))
+                return (None, None)
+        else:
+            try:
+                user_roles = [u.name for u in user.roles]
+                rank = 'Officer' if ADMIN_USER in user_roles else 'Member'
+            except Exception as e:
+                rank = 'Member'
+                print(e)
+            discord_id = user.id
+            if ADMIN_USER not in roles:
+                await self.bot.say(codify("Only officers may perform this action"))
+                return (None, None)
+        
+        return (rank, discord_id)
 
     @commands.command(pass_context=True)
     async def add(self,
@@ -27,46 +49,30 @@ class Add:
         discord id and can only be updated by either that member or an officer.
         **Officers can add a user by tagging them at the end. eg @drawven**
         Note: Total gear score and rank is auto calculated."""
-
-
         try:
             author = ctx.message.author
             roles = [u.name for u in author.roles]
-            member = Member(fam_name=fam_name,
-                            char_name=char_name,
-                            level= level,
-                            ap = ap,
-                            dp = dp,
-                            char_class= char_class,
-                            gear_score = ap + dp)
 
-            if not user:
-                member.discord = author.id
-                member.rank = 'Officer' if ADMIN_USER in roles else 'Member'
-                count = Member.objects(discord = author.id).count()
-                if count >= 1:
-                    await self.bot.say(codify("Cannot add more than one character to this discord id. "
-                                       "Try rerolling with gsbot reroll"))
-                    return
-            else:
-                try:
-                    user_roles = [u.name for u in user.roles]
-                    member.rank = 'Officer' if ADMIN_USER in user_roles else 'Member'
-                except Exception as e:
-                    member.rank = 'Member'
-                    print(e)
-                member.discord = user.id
-                if ADMIN_USER not in roles:
-                    await self.bot.say(codify("Only officers may perform this action"))
-                    return
+            rank, discord_id = await self.__get_rank_and_discord_id(author, user, roles)
 
-            member.server = ctx.message.server.id
-            member.save()
+            if rank is None or discord_id is None:
+                return
+
+            member = Member.create({
+                'fam_name': fam_name,
+                'char_name': char_name,
+                'level': level,
+                'ap': ap,
+                'dp': dp,
+                'char_class': char_class,
+                'gear_score': ap + dp,
+                'rank': rank,
+                'discord': discord_id,
+                'server': ctx.message.server.id
+            })
 
             row = get_row([member], False)
-            data = tabulate(row,
-                            HEADERS,
-                            'simple',)
+            data = tabulate(row, HEADERS, 'simple')
 
             await self.bot.say(codify("Success Adding User\n\n" + data))
 
@@ -88,38 +94,38 @@ class Add:
         else:
             try:
                 ## Adds historical data to todabase
-                update = Historical(
-                    type = "reroll",
-                    char_class = member.char_class,
-                    timestamp = date,
-                    level = member.level + (round(member.progress, 2) * .01),
-                    ap = member.ap,
-                    dp = member.dp,
-                    gear_score = member.gear_score
-                )
-                update.save()
+                update = Historical.create({
+                    'type': "reroll",
+                    'char_class': member.char_class,
+                    'timestamp': date,
+                    'level': member.level + (round(member.progress, 2) * .01),
+                    'ap': member.ap,
+                    'dp': member.dp,
+                    'gear_score': member.gear_score
+                })
 
-                member.char_name = new_char_name
-                member.ap = ap
-                member.dp = dp
-                member.level = level
-                member.gear_score = ap + dp
-                member.char_class = new_char_class
-                member.updated = date
-                member.hist_data.append(update)
-                member.save()
+                historical_data = member.hist_data
+                historical_data.append(update)
 
+                member.update_attributes({
+                    'char_name': new_char_name,
+                    'ap': ap, 
+                    'dp': dp,
+                    'level': level,
+                    'gear_score': ap + dp,
+                    'char_class': new_char_class,
+                    'updated': date,
+                    'hist_data': historical_data
+                })
+                
                 row = get_row([member], False)
-                data = tabulate(row,
-                                HEADERS,
-                                'simple',)
+                data = tabulate(row, HEADERS, 'simple')
 
                 await self.bot.say(codify("Success Rerolling\n\n" + data))
 
             except Exception as e:
                 print(e)
                 await self.bot.say("Could not reroll")
-
 
 def setup(bot):
     bot.add_cog(Add(bot))

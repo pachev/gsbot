@@ -11,8 +11,7 @@ import discord
 from discord.ext import commands
 
 from utils import *
-from models import Member
-
+from models.member import Member
 
 # Main connection function offered by mongoengine defaults are localhost:27017
 connect(DB_NAME,

@@ -1,26 +1,29 @@
 from mongoengine import *
 from datetime import datetime
 from configparser import ConfigParser  
-from utils import COLLECTION, HIST_COLLECTION
+from utils import COLLECTION
+from .model_mixin import ModelMixin
+from .historical import Historical
 
+class Member(Document, ModelMixin):
+    DB_COLUMNS = [
+        'rank', 
+        'fam_name', 
+        'char_name', 
+        'char_class', 
+        'discord', 
+        'server', 
+        'level', 
+        'ap', 
+        'dp', 
+        'gear_score', 
+        'updated', 
+        'progress', 
+        'gear_pic', 
+        'server',
+        'hist_data'
+    ]
 
-# These classes are ORMs provided by mongoengine. It's a cleaner way of
-# adding and deleting data throughout the bot
-
-class Historical(Document):
-    type = StringField(max_lenght=50)
-    char_class = StringField(max_lenght=50)
-    timestamp = DateTimeField(default=datetime.now)
-    level = FloatField()
-    ap = IntField(max_lenght=5)
-    dp = IntField(max_lenght=5)
-    gear_score = IntField(max_lenght=10)
-    meta = {
-        'collection' : HIST_COLLECTION,
-    }
-
-
-class Member(Document):
     rank = StringField(max_lenght=50)
     fam_name = StringField(max_lenght=50)
     char_name = StringField(max_lenght=50)
@@ -43,5 +46,4 @@ class Member(Document):
     @queryset_manager
     def objects(doc_cls, queryset):
         # default order is gear score descending
-        return queryset.order_by('-gear_score')
-
+        return queryset.order_by('-gear_score') 

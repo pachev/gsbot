@@ -3,7 +3,7 @@ from configparser import ConfigParser
 
 # The inital config.ini must be supplied in order to retrieve
 # basic information
-CONFIG = ConfigParser()
+CONFIG = ConfigParser(allow_no_value=True)
 CONFIG.read('config.ini')
 
 COLLECTION = CONFIG.get('db', 'collection')
