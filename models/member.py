@@ -2,8 +2,8 @@ from mongoengine import *
 from datetime import datetime
 from configparser import ConfigParser  
 from utils import COLLECTION
-from model_mixing import ModelMixin
-from historical import Historical
+from .model_mixin import ModelMixin
+from .historical import Historical
 
 class Member(Document, ModelMixin):
     DB_COLUMNS = [

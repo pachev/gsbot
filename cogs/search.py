@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from mongoengine import *
 
-from member import Member
+from models.member import Member
 from utils import *
 
 

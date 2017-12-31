@@ -2,7 +2,7 @@ from mongoengine import *
 from datetime import datetime
 from configparser import ConfigParser  
 from utils import HIST_COLLECTION
-from model_mixing import ModelMixin
+from .model_mixin import ModelMixin
 
 class Historical(Document, ModelMixin):
     DB_COLUMNS = [
