@@ -3,7 +3,8 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from models import Member, Historical
+from member import Member
+from historical import Historical
 from utils import *
 
 
@@ -32,25 +33,26 @@ class Update:
                     return
 
             # Adds historical data to database
-            update = Historical(
-                type = "update",
-                char_class = member.char_class,
-                timestamp = date,
-                level = member.level + (round(member.progress, 2) * .01),
-                ap = member.ap,
-                dp = member.dp,
-                gear_score = member.gear_score
-            )
-            update.save()
+            update = Historical.create({
+                'type': "update",
+                'char_class': member.char_class,
+                'timestamp': date,
+                'level': member.level + (round(member.progress, 2) * .01),
+                'ap': member.ap,
+                'dp': member.dp,
+                'gear_score': member.gear_score
+            })
 
-            member.level = level
-            member.ap = ap
-            member.dp = dp
-            member.gear_score = ap + dp
-            member.progress = level_percent
-            member.updated = date
-            member.hist_data.append(update)
-            member.save()
+            member.update({
+                'char_name': new_char_name,
+                'ap': ap, 
+                'dp': dp,
+                'level': level,
+                'gear_score': ap + dp,
+                'char_class': new_char_class,
+                'updated': date,
+                'hist_data': historical_data
+            })
 
             row = get_row([member], False)
             data = tabulate(row,

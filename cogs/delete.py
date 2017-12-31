@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 
-from models import Member
+from member import Member
 from utils import *
 
 
