@@ -9,6 +9,7 @@ CONFIG.read('config.ini')
 COLLECTION = CONFIG.get('db', 'collection')
 HIST_COLLECTION = CONFIG.get('db', 'historical')
 DB_NAME = CONFIG.get('db', 'name')
+DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')
 DB_PASS = CONFIG.get('auth', 'pwd')
 TOKEN = CONFIG.get('auth', 'dev_token')
@@ -26,8 +27,34 @@ INITIAL_EXTENSIONS = ('cogs.add',
 
 HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'DP', 'GS', 'Updated']
 
+CHARACTER_CLASSES = [
+    "MUSA",
+    "DARKKNIGHT",
+    "BERSERKER",
+    "KUNOICHI",
+    "MAEHWA",
+    "MYSTIC",
+    "NINJA",
+    "RANGER",
+    "SORCERESS",
+    "STRIKER",
+    "TAMER",
+    "VALKYRIE",
+    "WARRIOR",
+    "WITCH",
+    "WIZARD",
+]
+
+CHARACTER_CLASS_SHORT = {
+    "DK": "DARKKNIGHT",
+    "ZERKER": "BERSERKER",
+    "KUNO": "KUNOICHI",
+    "SORC": "SORCERESS",
+    "VALK": "VALKYRIE",
+    }
+
 DESCRIPTION = '''
-This the official Gear Score bot. 
+This the official Gear Score bot.
 Made by drawven(drawven@gmail.com)
 '''
 

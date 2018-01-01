@@ -49,7 +49,34 @@ class Add:
         discord id and can only be updated by either that member or an officer.
         **Officers can add a user by tagging them at the end. eg @drawven**
         Note: Total gear score and rank is auto calculated."""
+
         try:
+            # if char_class is shorthand for a class name (EX. DK = DARKKNIGHT) then set it to the real name
+            char_class = CHARACTER_CLASS_SHORT.get(char_class.upper()) if CHARACTER_CLASS_SHORT.get(char_class.upper()) else char_class
+
+            # check for invalid class names
+            if char_class.upper() not in CHARACTER_CLASSES:
+                # find possible class names that user was trying to match
+                possible_classes = list(filter(
+                            lambda class_name: char_class.upper() in class_name,
+                            CHARACTER_CLASSES,
+                ))
+                if len(possible_classes) > 1:
+                    await self.bot.say(codify("Character class not recognized.\n"
+                        "Did you mean {}?".format(", ".join(
+                            possible_classes[:-1]) + " or " + possible_classes[-1])
+                    ))
+                elif len(possible_classes) == 1:
+                    await self.bot.say(codify("Character class not recognized.\n"
+                        "Did you mean {}?".format(possible_classes[0])
+                    ))
+                else:
+                    await self.bot.say(
+                            codify("Character class not recognized, here is a list "
+                                    "of recognized classes\n "
+                                    + "\n ".join(CHARACTER_CLASSES)))
+                return
+
             author = ctx.message.author
             roles = [u.name for u in author.roles]
 
