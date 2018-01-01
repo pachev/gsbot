@@ -1,12 +1,12 @@
 language: python
 cache: pip
-
 python:
-  - 3.6
-  - pypy3
-
+- 3.6
+- pypy3
 services:
-  - mongodb
-  
+- mongodb
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
+before_install:
+- openssl aes-256-cbc -K $encrypted_a0a687274364_key -iv $encrypted_a0a687274364_iv
+  -in config.ini.enc -out config.ini -d
