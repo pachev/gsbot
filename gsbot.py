@@ -15,6 +15,7 @@ from models.member import Member
 
 # Main connection function offered by mongoengine defaults are localhost:27017
 connect(DB_NAME,
+        host=DB_HOST,
         username=DB_USER,
         password=DB_PASS,
         authentication_source=DB_NAME)
