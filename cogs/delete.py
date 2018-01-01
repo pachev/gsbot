@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 
-from models.member import Member
+from models.character import Character
 from utils import *
 
 
@@ -20,9 +20,9 @@ class Delete:
         try:
             author = ctx.message.author
             if not fam_name:
-                member = Member.objects(discord = author.id).first()
+                member = Character.objects(discord = author.id).first()
             else:
-                member = Member.objects(fam_name = fam_name, server = ctx.message.server.id).first()
+                member = Character.objects(fam_name = fam_name, server = ctx.message.server.id).first()
                 roles = [u.name for u in author.roles]
                 if ADMIN_USER not in roles:
                     await self.bot.say("Only officers may perform this action")

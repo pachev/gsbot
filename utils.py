@@ -6,8 +6,10 @@ from configparser import ConfigParser
 CONFIG = ConfigParser(allow_no_value=True)
 CONFIG.read('config.ini')
 
-COLLECTION = CONFIG.get('db', 'collection')
-HIST_COLLECTION = CONFIG.get('db', 'historical')
+CHARACTER_COLLECTION = CONFIG.get('db', 'character_collection')
+SERVER_COLLECTION = CONFIG.get('db', 'server_collection')
+MEMBER_COLLECTION = CONFIG.get('db', 'member_collection')
+HIST_COLLECTION = CONFIG.get('db', 'historical_collection')
 DB_NAME = CONFIG.get('db', 'name')
 DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')

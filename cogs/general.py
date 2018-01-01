@@ -3,7 +3,7 @@ import csv
 from discord.ext import commands
 from tabulate import tabulate
 
-from models.member import Member
+from models.character import Character
 from utils import *
 
 
@@ -20,7 +20,7 @@ class General:
 
         try:
             info = []
-            members = Member.objects(server=ctx.message.server.id)
+            members = Character.objects(server=ctx.message.server.id)
             if members:
                 officers = members(rank='Officer')
                 average = members.average('gear_score')
@@ -48,7 +48,7 @@ class General:
     async def export(self):
         """Exports current guild data"""
 
-        members = Member.objects()
+        members = Character.objects()
         rows = get_row(members, False)
         rows.insert(0, HEADERS)
         try:

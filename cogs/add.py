@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from models.member import Member
+from models.character import Character
 from models.historical import Historical
 from utils import *
 
@@ -17,7 +17,7 @@ class Add:
         if not user:
             discord_id = author.id
             rank = 'Officer' if ADMIN_USER in roles else 'Member'
-            if Member.objects(discord = author.id).count() >= 1:
+            if Character.objects(discord = author.id).count() >= 1:
                 await self.bot.say(codify("Cannot add more than one character to this discord id. "
                                     "Try rerolling with gsbot reroll"))
                 return (None, None)
@@ -85,7 +85,7 @@ class Add:
             if rank is None or discord_id is None:
                 return
 
-            member = Member.create({
+            member = Character.create({
                 'fam_name': fam_name,
                 'char_name': char_name,
                 'level': level,
@@ -112,7 +112,7 @@ class Add:
         """Just for someone special: Allows you to reroll """
 
         author = ctx.message.author.id
-        member = Member.objects(discord = author).first()
+        member = Character.objects(discord = author).first()
         date = datetime.now()
         if not member:
             await self.bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")

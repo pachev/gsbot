@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from mongoengine import *
 
-from models.member import Member
+from models.character import Character
 from utils import *
 
 
@@ -17,8 +17,8 @@ class Search:
     async def lookup(self, ctx, name=""):
         """Looks up a guild member by family name or character name"""
         try:
-            members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name),
-                                     server = ctx.message.server.id)
+            members = Character.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name),
+                                        server = ctx.message.server.id)
             rows = get_row(members, False)
             data = tabulate(rows,
                             HEADERS,
@@ -40,15 +40,15 @@ class Search:
         try:
 
             if char_class.lower() == "dk":
-                members = Member.objects(Q(char_class__iexact = char_class)
-                                         | Q(char_class__iexact = "dark")
-                                         | Q(char_class__iexact = "darkknight")
-                                         | Q(char_class__iexact = "dark knight"))
+                members = Character.objects(Q(char_class__iexact = char_class)
+                                            | Q(char_class__iexact = "dark")
+                                            | Q(char_class__iexact = "darkknight")
+                                            | Q(char_class__iexact = "dark knight"))
             elif char_class.lower() == "sorc":
-                members = Member.objects(Q(char_class__iexact = char_class)
-                                         | Q(char_class__iexact = "sorceress"))
+                members = Character.objects(Q(char_class__iexact = char_class)
+                                            | Q(char_class__iexact = "sorceress"))
             else:
-                members = Member.objects(char_class__iexact = char_class)
+                members = Character.objects(char_class__iexact = char_class)
 
             count = members(server = ctx.message.server.id).count()
             rows = get_row(members(server = ctx.message.server.id), False)

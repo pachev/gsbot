@@ -3,7 +3,7 @@ from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
 
-from models.member import Member
+from models.character import Character
 from utils import *
 
 
@@ -21,7 +21,7 @@ class Extras:
 
         try:
             author = ctx.message.author
-            member = Member.objects(discord = author.id).first()
+            member = Character.objects(discord = author.id).first()
             member.gear_pic = url
             member.save()
             await self.bot.say(codify("Picture added successfully"))
