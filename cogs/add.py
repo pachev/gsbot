@@ -4,7 +4,9 @@ from tabulate import tabulate
 from datetime import datetime
 
 from models.character import Character
+from models.member import Member
 from models.historical import Historical
+from models.server import Server
 from utils import *
 
 class Add:
@@ -16,11 +18,8 @@ class Add:
     async def __get_rank_and_discord_id(self, author, user, roles):
         if not user:
             discord_id = author.id
+            discord_username = author.name
             rank = 'Officer' if ADMIN_USER in roles else 'Member'
-            if Character.objects(discord = author.id).count() >= 1:
-                await self.bot.say(codify("Cannot add more than one character to this discord id. "
-                                    "Try rerolling with gsbot reroll"))
-                return (None, None)
         else:
             try:
                 user_roles = [u.name for u in user.roles]
@@ -29,11 +28,12 @@ class Add:
                 rank = 'Member'
                 print(e)
             discord_id = user.id
+            discord_username = user.name
             if ADMIN_USER not in roles:
                 await self.bot.say(codify("Only officers may perform this action"))
                 return (None, None)
         
-        return (rank, discord_id)
+        return rank, discord_id, discord_username
 
     @commands.command(pass_context=True)
     async def add(self,
@@ -45,63 +45,51 @@ class Add:
                   dp: int,
                   char_class,
                   user: discord.User = None):
-        """Adds yourself as a member to the database. This member is linked with your
+        """Adds your primary character to the guild. This character is linked with your
         discord id and can only be updated by either that member or an officer.
         **Officers can add a user by tagging them at the end. eg @drawven**
         Note: Total gear score and rank is auto calculated."""
 
+        # Checks character name to make sure it is correct
         try:
-            # if char_class is shorthand for a class name (EX. DK = DARKKNIGHT) then set it to the real name
-            char_class = CHARACTER_CLASS_SHORT.get(char_class.upper()) if CHARACTER_CLASS_SHORT.get(char_class.upper()) else char_class
 
-            # check for invalid class names
-            if char_class.upper() not in CHARACTER_CLASSES:
-                # find possible class names that user was trying to match
-                possible_classes = list(filter(
-                            lambda class_name: char_class.upper() in class_name,
-                            CHARACTER_CLASSES,
-                ))
-                if len(possible_classes) > 1:
-                    await self.bot.say(codify("Character class not recognized.\n"
-                        "Did you mean {}?".format(", ".join(
-                            possible_classes[:-1]) + " or " + possible_classes[-1])
-                    ))
-                elif len(possible_classes) == 1:
-                    await self.bot.say(codify("Character class not recognized.\n"
-                        "Did you mean {}?".format(possible_classes[0])
-                    ))
-                else:
-                    await self.bot.say(
-                            codify("Character class not recognized, here is a list "
-                                    "of recognized classes\n "
-                                    + "\n ".join(CHARACTER_CLASSES)))
+            if not await check_character_name(self.bot, char_class):
                 return
-
             author = ctx.message.author
+            server = ctx.message.server.id
             roles = [u.name for u in author.roles]
 
-            rank, discord_id = await self.__get_rank_and_discord_id(author, user, roles)
-
+            rank, discord_id, discord_username = await self.__get_rank_and_discord_id(author, user, roles)
             if rank is None or discord_id is None:
                 return
 
-            member = Character.create({
+            member = Member.objects(discord = discord_id).first()
+            character = Character.objects().first()
+            isPrimary = False if character else True
+            if not member:
+                member = Member.create({'discord': discord_id, 'servers': [server]})
+                isPrimary = True
+
+            character = Character.create({
+                'rank': rank,
                 'fam_name': fam_name,
-                'char_name': char_name,
+                'char_name': char_name.upper,
+                'char_class': char_class.upper(),
+                'server': server,
                 'level': level,
                 'ap': ap,
                 'dp': dp,
-                'char_class': char_class,
                 'gear_score': ap + dp,
-                'rank': rank,
-                'discord': discord_id,
-                'server': ctx.message.server.id
+                'primary': isPrimary,
+                'member': author.id,
             })
+            member.characters.append(character)
 
-            row = get_row([member], False)
+            row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
 
-            await self.bot.say(codify("Success Adding User\n\n" + data))
+            await self.bot.say(codify("Success Adding Character for member {}\n\n".
+                                      format(discord_username.upper()) + data))
 
         except Exception as e:
             print(e)
@@ -112,40 +100,43 @@ class Add:
         """Just for someone special: Allows you to reroll """
 
         author = ctx.message.author.id
-        member = Character.objects(discord = author).first()
+        character = Character.objects(member = author, primary=True).first()
         date = datetime.now()
-        if not member:
-            await self.bot.say("Can't reroll if you're not in the database :(, try adding yoursell first")
+        if not character:
+            await self.bot.say("Can't reroll if you're not in the database :(, try adding a character first")
+            return
+
+        if not await check_character_name(self.bot, new_char_class):
             return
 
         else:
             try:
-                ## Adds historical data to todabase
+                ## Adds historical data to databse
                 update = Historical.create({
                     'type': "reroll",
-                    'char_class': member.char_class,
+                    'char_class': character.char_class,
                     'timestamp': date,
-                    'level': member.level + (round(member.progress, 2) * .01),
-                    'ap': member.ap,
-                    'dp': member.dp,
-                    'gear_score': member.gear_score
+                    'level':float(str(character.level) + '.' + str(round(character.progress))) ,
+                    'ap': character.ap,
+                    'dp': character.dp,
+                    'gear_score': character.gear_score
                 })
 
-                historical_data = member.hist_data
+                historical_data = character.hist_data
                 historical_data.append(update)
 
-                member.update_attributes({
+                character.update_attributes({
                     'char_name': new_char_name,
                     'ap': ap, 
                     'dp': dp,
                     'level': level,
                     'gear_score': ap + dp,
-                    'char_class': new_char_class,
+                    'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data
                 })
                 
-                row = get_row([member], False)
+                row = get_row([character], False)
                 data = tabulate(row, HEADERS, 'simple')
 
                 await self.bot.say(codify("Success Rerolling\n\n" + data))

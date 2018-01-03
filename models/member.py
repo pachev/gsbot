@@ -12,8 +12,8 @@ class Member(Document, ModelMixin):
     ]
 
     characters = ListField(ReferenceField(Character))
-    discord = IntField
-    servers = ListField(IntField)
+    discord = IntField(primary_key=True)
+    servers = ListField(IntField())
     meta = {
         'collection' : MEMBER_COLLECTION,
     }

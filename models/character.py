@@ -7,8 +7,8 @@ from .historical import Historical
 
 class Character(Document, ModelMixin):
     DB_COLUMNS = [
-        'rank', 
-        'fam_name', 
+        'rank',
+        'fam_name',
         'char_name', 
         'char_class', 
         'server',
@@ -19,8 +19,8 @@ class Character(Document, ModelMixin):
         'updated', 
         'progress', 
         'gear_pic', 
-        'server',
         'primary',
+        'member',
         'hist_data'
     ]
 
@@ -38,6 +38,7 @@ class Character(Document, ModelMixin):
     gear_pic = URLField(default="https://i.imgur.com/UFViCXj.jpg")
     server = IntField()
     primary = BooleanField()
+    member = IntField()
     hist_data = ListField(ReferenceField(Historical))
     meta = {
         'collection' : CHARACTER_COLLECTION,
