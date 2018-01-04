@@ -47,4 +47,9 @@ class Character(Document, ModelMixin):
     @queryset_manager
     def objects(doc_cls, queryset):
         # default order is gear score descending
-        return queryset.order_by('-gear_score') 
+        return queryset.order_by('-gear_score')
+
+    @queryset_manager
+    def primary_chars(doc_cls, queryset):
+        # default order is gear score descending
+        return queryset.filter(primary=True)

@@ -33,7 +33,26 @@ class Add:
                 await self.bot.say(codify("Only officers may perform this action"))
                 return (None, None)
         
-        return rank, discord_id, discord_username
+        return (rank, discord_id, discord_username)
+
+    def __get_server_and_member(self, server_id, discord_id):
+        member = Member.objects(discord = discord_id).first()
+        server = Server.objects(id=server_id).first()
+
+        if not server:
+            server = Server.create({'id': server_id})
+        if not member:
+            member = Member.create({'discord': discord_id})
+
+        # Checks if member being added is in the server
+        server_member = Member.objects(servers=server_id, discord=discord_id).first()
+        if not server_member:
+            server.members.append(member)
+            server.save()
+            member.servers.append(server_id)
+            member.save()
+
+        return (server, member)
 
     @commands.command(pass_context=True)
     async def add(self,
@@ -56,34 +75,33 @@ class Add:
             if not await check_character_name(self.bot, char_class):
                 return
             author = ctx.message.author
-            server = ctx.message.server.id
+            server_id= ctx.message.server.id
             roles = [u.name for u in author.roles]
-
             rank, discord_id, discord_username = await self.__get_rank_and_discord_id(author, user, roles)
+            server, member = self.__get_server_and_member(server_id, discord_id)
+
             if rank is None or discord_id is None:
                 return
 
-            member = Member.objects(discord = discord_id).first()
-            character = Character.objects().first()
+            character = Character.primary_chars(member=discord_id).first()
             isPrimary = False if character else True
-            if not member:
-                member = Member.create({'discord': discord_id, 'servers': [server]})
-                isPrimary = True
+
 
             character = Character.create({
                 'rank': rank,
-                'fam_name': fam_name,
-                'char_name': char_name.upper,
+                'fam_name': fam_name.upper(),
+                'char_name': char_name.upper(),
                 'char_class': char_class.upper(),
-                'server': server,
+                'server': server_id,
                 'level': level,
                 'ap': ap,
                 'dp': dp,
                 'gear_score': ap + dp,
                 'primary': isPrimary,
-                'member': author.id,
+                'member': discord_id,
             })
             member.characters.append(character)
+            member.save()
 
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
@@ -97,10 +115,10 @@ class Add:
 
     @commands.command(pass_context=True)
     async def reroll(self, ctx, new_char_name, level: int, ap : int, dp: int, new_char_class):
-        """Just for someone special: Allows you to reroll """
+        """Just for someone special: Allows you to reroll your main character """
 
         author = ctx.message.author.id
-        character = Character.objects(member = author, primary=True).first()
+        character = Character.primary_chars(member = author).first()
         date = datetime.now()
         if not character:
             await self.bot.say("Can't reroll if you're not in the database :(, try adding a character first")
@@ -111,10 +129,10 @@ class Add:
 
         else:
             try:
-                ## Adds historical data to databse
+                ## Adds historical data to database
                 update = Historical.create({
                     'type': "reroll",
-                    'char_class': character.char_class,
+                    'char_class': character.char_class.upper(),
                     'timestamp': date,
                     'level':float(str(character.level) + '.' + str(round(character.progress))) ,
                     'ap': character.ap,
@@ -126,7 +144,7 @@ class Add:
                 historical_data.append(update)
 
                 character.update_attributes({
-                    'char_name': new_char_name,
+                    'char_name': new_char_name.upper(),
                     'ap': ap, 
                     'dp': dp,
                     'level': level,

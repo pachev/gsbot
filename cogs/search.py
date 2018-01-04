@@ -15,9 +15,9 @@ class Search:
 
     @commands.command(pass_context=True)
     async def lookup(self, ctx, name=""):
-        """Looks up a guild member by family name or character name"""
+        """Looks up main characters by family name or character name"""
         try:
-            members = Character.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name),
+            members = Character.primary_chars(Q(fam_name__icontains = name) | Q(char_name__icontains = name),
                                         server = ctx.message.server.id)
             rows = get_row(members, False)
             data = tabulate(rows,
@@ -36,19 +36,19 @@ class Search:
 
     @commands.command(pass_context=True)
     async def class_search(self, ctx, char_class=""):
-        """Looks up guild members by class"""
+        """Looks up main characters by class"""
         try:
 
             if char_class.lower() == "dk":
-                members = Character.objects(Q(char_class__iexact = char_class)
+                members = Character.primary_chars(Q(char_class__iexact = char_class)
                                             | Q(char_class__iexact = "dark")
                                             | Q(char_class__iexact = "darkknight")
                                             | Q(char_class__iexact = "dark knight"))
             elif char_class.lower() == "sorc":
-                members = Character.objects(Q(char_class__iexact = char_class)
+                members = Character.primary_chars(Q(char_class__iexact = char_class)
                                             | Q(char_class__iexact = "sorceress"))
             else:
-                members = Character.objects(char_class__iexact = char_class)
+                members = Character.primary_chars(char_class__iexact = char_class)
 
             count = members(server = ctx.message.server.id).count()
             rows = get_row(members(server = ctx.message.server.id), False)

@@ -20,7 +20,7 @@ class General:
 
         try:
             info = []
-            members = Character.objects(server=ctx.message.server.id)
+            members = Character.primary_chars(server=ctx.message.server.id)
             if members:
                 officers = members(rank='Officer')
                 average = members.average('gear_score')

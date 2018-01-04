@@ -15,45 +15,44 @@ class Update:
 
     async def __get_member(self, author, fam_name, server_id):
         if not fam_name:
-            member = Character.objects(discord = author.id).first()
+            character = Character.primary_chars(member = author.id).first()
         else:
-            member = Character.objects(fam_name = fam_name, server = ctx.message.server.id).first()
+            character = Character.primary_chars(fam_name = fam_name, server = server_id).first()
             roles = [u.name for u in author.roles]
             if ADMIN_USER not in roles:
                 await self.bot.say("Only officers may perform this action")
                 return
         
-        return member
+        return character
 
     @commands.command(pass_context=True)
     async def update(self, ctx, level: int, ap: int, dp: int, level_percent: float, fam_name=''):
-        """Updates a user's gear score. Each user is linked to a gear score in the database
-        and can only update their scores. **Officers can add an additional family name at 
+        """Updates user's main character's gear score. **Officers can add an additional family name at
         the end of this command to update another user"""
         date = datetime.now()
 
         try:
             author = ctx.message.author
             
-            member = await self.__get_member(author, fam_name, ctx.message.server.id)
-            if member is None:
+            character = await self.__get_member(author, fam_name, ctx.message.server.id)
+            if character is None:
                 return
 
             # Adds historical data to database
             update = Historical.create({
                 'type': "update",
-                'char_class': member.char_class,
+                'char_class':character.char_class.upper(),
                 'timestamp': date,
-                'level': member.level + (round(member.progress, 2) * .01),
-                'ap': member.ap,
-                'dp': member.dp,
-                'gear_score': member.gear_score
+                'level': float(str(character.level) + '.' + str(round(character.progress))) ,
+                'ap': character.ap,
+                'dp': character.dp,
+                'gear_score': character.gear_score
             })
 
-            historical_data = member.hist_data
+            historical_data = character.hist_data
             historical_data.append(update)
 
-            member.update_attributes({
+            character.update_attributes({
                 'ap': ap, 
                 'dp': dp,
                 'level': level,
@@ -63,7 +62,7 @@ class Update:
                 'hist_data': historical_data
             })
 
-            row = get_row([member], False)
+            row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
 
             await self.bot.say(codify(data))

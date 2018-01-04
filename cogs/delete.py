@@ -14,15 +14,15 @@ class Delete:
 
     @commands.command(pass_context=True)
     async def delete(self, ctx, fam_name=''):
-        """Deletes character from list. **officers can add an optional family name at the
+        """Deletes users's main character from list. **officers can add an optional family name at the
         end to delete a certain user"""
 
         try:
             author = ctx.message.author
             if not fam_name:
-                member = Character.objects(discord = author.id).first()
+                member = Character.primary_chars(discord = author.id).first()
             else:
-                member = Character.objects(fam_name = fam_name, server = ctx.message.server.id).first()
+                member = Character.primary_chars(fam_name = fam_name, server = ctx.message.server.id).first()
                 roles = [u.name for u in author.roles]
                 if ADMIN_USER not in roles:
                     await self.bot.say("Only officers may perform this action")

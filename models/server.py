@@ -1,6 +1,5 @@
 from mongoengine import *
-from datetime import datetime
-from utils import MEMBER_COLLECTION
+from utils import SERVER_COLLECTION
 from .model_mixin import ModelMixin
 from .member import Member
 
@@ -10,8 +9,8 @@ class Server(Document, ModelMixin):
         'members',
     ]
 
-    id = IntField
+    id = IntField(primary_key=True)
     members = ListField(ReferenceField(Member))
     meta = {
-        'collection' : MEMBER_COLLECTION,
+        'collection' : SERVER_COLLECTION,
     }
