@@ -7,10 +7,14 @@ class Server(Document, ModelMixin):
     DB_COLUMNS = [
         'id',
         'members',
+        'name',
+        'avatar',
     ]
 
     id = IntField(primary_key=True)
     members = ListField(ReferenceField(Member))
+    name = StringField()
+    avatar = StringField()
     meta = {
         'collection' : SERVER_COLLECTION,
     }

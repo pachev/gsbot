@@ -15,10 +15,9 @@ class Add:
     def __init__(self, bot):
         self.bot = bot
 
-    async def __get_rank_and_discord_id(self, author, user, roles):
+    async def __get_rank_and_member(self, author, user, roles):
         if not user:
-            discord_id = author.id
-            discord_username = author.name
+            discord_user = author
             rank = 'Officer' if ADMIN_USER in roles else 'Member'
         else:
             try:
@@ -27,29 +26,37 @@ class Add:
             except Exception as e:
                 rank = 'Member'
                 print(e)
-            discord_id = user.id
-            discord_username = user.name
+            discord_user = user
             if ADMIN_USER not in roles:
                 await self.bot.say(codify("Only officers may perform this action"))
                 return (None, None)
         
-        return (rank, discord_id, discord_username)
+        return (rank, discord_user)
 
-    def __get_server_and_member(self, server_id, discord_id):
-        member = Member.objects(discord = discord_id).first()
-        server = Server.objects(id=server_id).first()
+    def __get_server_and_member(self, discord_server, discord_user):
+        member = Member.objects(discord=discord_user.id).first()
+        server = Server.objects(id=discord_server.id).first()
 
         if not server:
-            server = Server.create({'id': server_id})
+            server = Server.create({
+                'id': discord_server.id,
+                'name': discord_server.name,
+                'avatar': discord_server.avatar
+            })
+
         if not member:
-            member = Member.create({'discord': discord_id})
+            member = Member.create({
+                'discord': discord_user.id,
+                'name': discord_user.name,
+                'avatar': discord_user.avatar
+            })
 
         # Checks if member being added is in the server
-        server_member = Member.objects(servers=server_id, discord=discord_id).first()
+        server_member = Member.objects(servers=discord_server.id, discord=discord_user.id).first()
         if not server_member:
             server.members.append(member)
             server.save()
-            member.servers.append(server_id)
+            member.servers.append(discord_server.id)
             member.save()
 
         return (server, member)
@@ -75,15 +82,15 @@ class Add:
             if not await check_character_name(self.bot, char_class):
                 return
             author = ctx.message.author
-            server_id= ctx.message.server.id
+            server = ctx.message.server
             roles = [u.name for u in author.roles]
-            rank, discord_id, discord_username = await self.__get_rank_and_discord_id(author, user, roles)
-            server, member = self.__get_server_and_member(server_id, discord_id)
+            rank, discord_user = await self.__get_rank_and_discord_id(author, user, roles)
+            member = self.__get_server_and_member(server, discord_user)
 
-            if rank is None or discord_id is None:
+            if rank is None or discord_user.id is None:
                 return
 
-            character = Character.primary_chars(member=discord_id).first()
+            character = Character.primary_chars(member=discord_user.id).first()
             isPrimary = False if character else True
 
 
@@ -92,13 +99,13 @@ class Add:
                 'fam_name': fam_name.upper(),
                 'char_name': char_name.upper(),
                 'char_class': char_class.upper(),
-                'server': server_id,
+                'server': server.id,
                 'level': level,
                 'ap': ap,
                 'dp': dp,
                 'gear_score': ap + dp,
                 'primary': isPrimary,
-                'member': discord_id,
+                'member': discord_user.id,
             })
             member.characters.append(character)
             member.save()
@@ -107,7 +114,7 @@ class Add:
             data = tabulate(row, HEADERS, 'simple')
 
             await self.bot.say(codify("Success Adding Character for member {}\n\n".
-                                      format(discord_username.upper()) + data))
+                                      format(discord_user.name.upper()) + data))
 
         except Exception as e:
             print(e)

@@ -9,11 +9,15 @@ class Member(Document, ModelMixin):
         'characters',
         'discord',
         'servers',
+        'name',
+        'avatar',
     ]
 
     discord = IntField()
     characters = ListField(ReferenceField(Character))
     servers = ListField(IntField())
+    name = StringField()
+    avatar = StringField()
     meta = {
         'collection' : MEMBER_COLLECTION,
     }
