@@ -71,7 +71,7 @@ class Listing:
 
         # Checks if no sub-commands are invoked
         if ctx.invoked_subcommand is None:
-            await self.bot.say(codify("Sort by any category available(lvl, ap, dp, gs). Try gsbot help sort_by"))
+            await self.bot.say(codify("Sort by any category available(lvl, ap, dp). Try gsbot help sort_by"))
 
     @sort_by.command(pass_context=True)
     async def lvl(self, ctx, num=100):

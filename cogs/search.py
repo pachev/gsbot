@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 from mongoengine import *
+from typing import Any
 
 from models.member import Member
 from utils import *
@@ -14,11 +15,16 @@ class Search:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def lookup(self, ctx, name=""):
-        """Looks up a guild member by family name or character name"""
+    async def lookup(self, ctx, query):
+        """Looks up a guild member by family name or character name or pass in a like @drawven"""
         try:
-            members = Member.objects(Q(fam_name__icontains = name) | Q(char_name__icontains = name),
-                                     server = ctx.message.server.id)
+            mentions = ctx.message.mentions
+            if len(mentions) >= 1:
+                members = Member.objects(discord=mentions[0].id)
+            else:
+                members = Member.objects(Q(fam_name__icontains = query) | Q(char_name__icontains = query),
+                                         server = ctx.message.server.id)
+
             rows = get_row(members, False)
             data = tabulate(rows,
                             HEADERS,

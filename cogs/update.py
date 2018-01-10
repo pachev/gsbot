@@ -17,7 +17,7 @@ class Update:
         if not fam_name:
             member = Member.objects(discord = author.id).first()
         else:
-            member = Member.objects(fam_name = fam_name, server = ctx.message.server.id).first()
+            member = Member.objects(fam_name = fam_name, server = server_id).first()
             roles = [u.name for u in author.roles]
             if ADMIN_USER not in roles:
                 await self.bot.say("Only officers may perform this action")
@@ -66,7 +66,7 @@ class Update:
             row = get_row([member], False)
             data = tabulate(row, HEADERS, 'simple')
 
-            await self.bot.say(codify(data))
+            await self.bot.say(codify('Updating {} was a great success :D\n\n'.format(fam_name) + data))
 
         except Exception as e:
             print(e)
