@@ -44,11 +44,11 @@ class General:
             print(e)
             await self.bot.say("Could not retrieve info")
 
-    @commands.command()
-    async def export(self):
+    @commands.command(pass_context=True)
+    async def export(self, ctx):
         """Exports current guild data"""
 
-        members = Member.objects()
+        members = Member.objects(server=ctx.message.server.id)
         rows = get_row(members, False)
         rows.insert(0, HEADERS)
         try:
