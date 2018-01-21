@@ -4,7 +4,7 @@ from tabulate import tabulate
 from mongoengine import *
 from typing import Any
 
-from models.member import Member
+from models.character import Character
 from utils import *
 
 
@@ -16,13 +16,13 @@ class Search:
 
     @commands.command(pass_context=True)
     async def lookup(self, ctx, query):
-        """Looks up a guild member by family name or character name or pass in a like @drawven"""
+        """Looks up a guild member by family name or character name or pass in a user like @drawven"""
         try:
             mentions = ctx.message.mentions
             if len(mentions) >= 1:
-                members = Member.objects(discord=mentions[0].id)
+                members = Character.primary_chars(discord=mentions[0].id)
             else:
-                members = Member.objects(Q(fam_name__icontains = query) | Q(char_name__icontains = query),
+                members = Character.primary_chars(Q(fam_name__icontains = query) | Q(char_name__icontains = query),
                                          server = ctx.message.server.id)
 
             rows = get_row(members, False)
@@ -42,19 +42,19 @@ class Search:
 
     @commands.command(pass_context=True)
     async def class_search(self, ctx, char_class=""):
-        """Looks up guild members by class"""
+        """Looks up main characters by class"""
         try:
 
             if char_class.lower() == "dk":
-                members = Member.objects(Q(char_class__iexact = char_class)
-                                         | Q(char_class__iexact = "dark")
-                                         | Q(char_class__iexact = "darkknight")
-                                         | Q(char_class__iexact = "dark knight"))
+                members = Character.primary_chars(Q(char_class__iexact = char_class)
+                                            | Q(char_class__iexact = "dark")
+                                            | Q(char_class__iexact = "darkknight")
+                                            | Q(char_class__iexact = "dark knight"))
             elif char_class.lower() == "sorc":
-                members = Member.objects(Q(char_class__iexact = char_class)
-                                         | Q(char_class__iexact = "sorceress"))
+                members = Character.primary_chars(Q(char_class__iexact = char_class)
+                                            | Q(char_class__iexact = "sorceress"))
             else:
-                members = Member.objects(char_class__iexact = char_class)
+                members = Character.primary_chars(char_class__iexact = char_class)
 
             count = members(server = ctx.message.server.id).count()
             rows = get_row(members(server = ctx.message.server.id), False)

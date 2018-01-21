@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 
-from models.member import Member
+from models.character import Character
 from utils import *
 
 
@@ -13,13 +13,13 @@ class Listing:
 
     @commands.command(pass_context=True)
     async def list(self,ctx,num=100):
-        """List all the members and their gear score with optional limit. 
+        """List all the main characters and their gear score with optional limit.
         Example. gsbot list returns first 100 by default  and gsbot list 5 first 5 sorted by
         gear score"""
         try:
             print('server,', ctx.message.server.id)
-            members = Member.objects(server=ctx.message.server.id)
-            print(Member.objects().first().server)
+            members = Character.primary_chars(server=ctx.message.server.id)
+            print(Character.objects().first().server)
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
@@ -34,9 +34,9 @@ class Listing:
 
     @commands.command(pass_context=True)
     async def over(self, ctx, num=400):
-        """List all the members over a certain gear score"""
+        """List all the main characters over a certain gear score"""
         try:
-            members = Member.objects(gear_score__gte = num, server = ctx.message.server.id)
+            members = Character.primary_chars(gear_score__gte = num, server = ctx.message.server.id)
             rows = get_row(members,False)
 
             data = tabulate(rows,
@@ -52,9 +52,9 @@ class Listing:
 
     @commands.command(pass_context=True)
     async def under(self, ctx, num=400):
-        """List all the members under a certain gear score"""
+        """List all the main characters under a certain gear score"""
         try:
-            members = Member.objects(gear_score__lte = num, server = ctx.message.server.id)
+            members = Character.primary_chars(gear_score__lte = num, server = ctx.message.server.id)
             rows = get_row(members, False)
             data = tabulate(rows,
                             HEADERS,
@@ -77,7 +77,7 @@ class Listing:
     async def lvl(self, ctx, num=100):
         """ - Sorts list by level and progress with optional limiter"""
         try:
-            members = Member.objects(server = ctx.message.server.id).order_by('-level', '-progress')
+            members = Character.primary_chars(server = ctx.message.server.id).order_by('-level', '-progress')
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
@@ -94,7 +94,7 @@ class Listing:
     async def ap(self, ctx, num=100):
         """ - Sorts list by AP with optional limit"""
         try:
-            members = Member.objects(server=ctx.message.server.id).order_by('-ap')
+            members = Character.primary_chars(server=ctx.message.server.id).order_by('-ap')
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
@@ -111,7 +111,7 @@ class Listing:
     async def dp(self, ctx, num=100):
         """ - Sorts list by DP with optional limit"""
         try:
-            members = Member.objects(server=ctx.message.server.id).order_by('-dp')
+            members = Character.primary_chars(server=ctx.message.server.id).order_by('-dp')
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
