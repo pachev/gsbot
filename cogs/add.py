@@ -82,10 +82,10 @@ class Add:
             if not await check_character_name(self.bot, char_class):
                 return
             author = ctx.message.author
-            server = ctx.message.server
+            discord_server = ctx.message.server
             roles = [u.name for u in author.roles]
-            rank, discord_user = await self.__get_rank_and_discord_id(author, user, roles)
-            member = self.__get_server_and_member(server, discord_user)
+            rank, discord_user = await self.__get_rank_and_member(author, user, roles)
+            server, member = self.__get_server_and_member(discord_server, discord_user)
 
             if rank is None or discord_user.id is None:
                 return
@@ -99,7 +99,7 @@ class Add:
                 'fam_name': fam_name.upper(),
                 'char_name': char_name.upper(),
                 'char_class': char_class.upper(),
-                'server': server.id,
+                'server': discord_server.id,
                 'level': level,
                 'ap': ap,
                 'dp': dp,
@@ -113,7 +113,7 @@ class Add:
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
 
-            await self.bot.say(codify("Success Adding Character for member {}\n\n".
+            await self.bot.say(codify("Success Adding Character for member {} :D\n\n".
                                       format(discord_user.name.upper()) + data))
 
         except Exception as e:

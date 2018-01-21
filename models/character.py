@@ -28,7 +28,6 @@ class Character(Document, ModelMixin):
     fam_name = StringField(max_lenght=50)
     char_name = StringField(max_lenght=50)
     char_class = StringField(max_lenght=50)
-    server = StringField()
     level = IntField(max_lenght=4)
     ap = IntField(max_lenght=5)
     dp = IntField(max_lenght=5)

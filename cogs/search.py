@@ -20,7 +20,7 @@ class Search:
         try:
             mentions = ctx.message.mentions
             if len(mentions) >= 1:
-                members = Character.primary_chars(discord=mentions[0].id)
+                members = Character.primary_chars(member=mentions[0].id)
             else:
                 members = Character.primary_chars(Q(fam_name__icontains = query) | Q(char_name__icontains = query),
                                          server = ctx.message.server.id)

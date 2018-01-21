@@ -48,7 +48,7 @@ class General:
     async def export(self, ctx):
         """Exports current guild data"""
 
-        members = Character.objects(server=ctx.message.server.id)
+        members = Character.primary_chars(server=ctx.message.server.id)
         rows = get_row(members, False)
         rows.insert(0, HEADERS)
         try:
