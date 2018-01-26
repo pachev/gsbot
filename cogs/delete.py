@@ -20,7 +20,7 @@ class Delete:
         try:
             author = ctx.message.author
             if not fam_name:
-                member = Character.primary_chars(discord = author.id).first()
+                member = Character.primary_chars(member = author.id).first()
             else:
                 member = Character.primary_chars(fam_name = fam_name, server = ctx.message.server.id).first()
                 roles = [u.name for u in author.roles]
