@@ -30,8 +30,8 @@ class General:
                 officer_count = officers.count()
                 member_count = count - officer_count
                 info.append(['Average', round(average,2)])
-                info.append(['Lowest', lowest.gear_score, lowest.fam_name, lowest.char_name])
-                info.append(['Highest', highest.gear_score, highest.fam_name, highest.char_name])
+                info.append(['Lowest', lowest.gear_score, lowest.fam_name.title(), lowest.char_name.title()])
+                info.append(['Highest', highest.gear_score, highest.fam_name.title(), highest.char_name.title()])
                 info.append(['Total Officers', officer_count])
                 info.append(['Total Members', member_count])
                 info.append(['Guild Total', count])

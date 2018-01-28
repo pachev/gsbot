@@ -14,7 +14,7 @@ DB_NAME = CONFIG.get('db', 'name')
 DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')
 DB_PASS = CONFIG.get('auth', 'pwd')
-TOKEN = CONFIG.get('auth', 'dev_token')
+TOKEN = CONFIG.get('auth', 'token')
 
 # User role that officer commands are checked against
 ADMIN_USER = 'Officers'
@@ -68,12 +68,28 @@ def codify(s):
 
 def get_row(members, filter, num=-1):
     if filter:
-        return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.progress, u.ap, u.dp,
-                 u.gear_score, u.updated.strftime('%D')]
+        return [[u.rank.title(),
+                 u.fam_name.title(),
+                 u.char_name.title(),
+                 u.char_class.title(),
+                 u.level,
+                 u.progress,
+                 u.ap,
+                 u.dp,
+                 u.gear_score,
+                 u.updated.strftime('%D')]
                 for u in members[:num]]
 
-    return [[u.rank, u.fam_name, u.char_name, u.char_class, u.level, u.progress, u.ap, u.dp,
-             u.gear_score, u.updated.strftime('%D')]
+    return [[u.rank.title(),
+             u.fam_name.title(),
+             u.char_name.title(),
+             u.char_class.title(),
+             u.level,
+             u.progress,
+             u.ap,
+             u.dp,
+             u.gear_score,
+             u.updated.strftime('%D')]
             for u in members]
 
 
