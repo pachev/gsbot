@@ -13,11 +13,11 @@ class Update:
     def __init__(self, bot):
         self.bot = bot
 
-    async def __get_member(self, author, fam_name, server_id):
-        if not fam_name:
+    async def __get_member(self, author, user, server_id):
+        if not user:
             character = Character.primary_chars(member = author.id).first()
         else:
-            character = Character.primary_chars(fam_name = fam_name, server = server_id).first()
+            character = Character.primary_chars(member = user.id, server = server_id).first()
             roles = [u.name for u in author.roles]
             if ADMIN_USER not in roles:
                 await self.bot.say("Only officers may perform this action")
@@ -26,15 +26,14 @@ class Update:
         return character
 
     @commands.command(pass_context=True)
-    async def update(self, ctx, level: int, ap: int, dp: int, level_percent: float, fam_name=''):
-        """Updates user's main character's gear score. **Officers can add an additional family name at
-        the end of this command to update another user"""
+    async def update(self, ctx, level: int, ap: int, dp: int, level_percent: float, user: discord.User = None):
+        """Updates user's main character's gear score. **Officers can tag another user to update for them """
         date = datetime.now()
 
         try:
             author = ctx.message.author
-            
-            character = await self.__get_member(author, fam_name, ctx.message.server.id)
+
+            character = await self.__get_member(author, user, ctx.message.server.id)
             if character is None:
                 return
 
