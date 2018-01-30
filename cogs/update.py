@@ -64,11 +64,11 @@ class Update:
 
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
-
-            await self.bot.say(codify('Updating {} was a great success :D\n\n'.format(fam_name) + data))
+            logActivity('{} has updated a character'.format(character.fam_name), author.name)
+            await self.bot.say(codify('Updating {} was a great success :D\n\n'.format(character.fam_name) + data))
 
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say("Error updating user")
 
 

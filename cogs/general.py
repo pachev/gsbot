@@ -57,7 +57,7 @@ class General:
                 wr.writerows(rows)
             await self.bot.upload('./members.csv')
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say("Something went horribly wrong")
 
 

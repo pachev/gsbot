@@ -45,7 +45,7 @@ class Extras:
                 await self.bot.say(page)
         except Exception as e:
             await self.bot.say("Something went horribly wrong")
-            print(e)
+            print_error(e)
 
     @commands.command(pass_context=True)
     async def set_main(self,ctx,num:int=0):
@@ -70,7 +70,7 @@ class Extras:
             await self.bot.say(codify('Main Character Switched Succesfuly to {}'.format(main.char_name)))
         except Exception as e:
             await self.bot.say("Something went horribly wrong")
-            print(e)
+            print_error(e)
 
 
 def setup(bot):

@@ -22,7 +22,7 @@ class Delete:
             if not fam_name:
                 member = Character.primary_chars(member = author.id).first()
             else:
-                member = Character.primary_chars(fam_name = fam_name, server = ctx.message.server.id).first()
+                member = Character.primary_chars(fam_name__icontains = fam_name, server = ctx.message.server.id).first()
                 roles = [u.name for u in author.roles]
                 if ADMIN_USER not in roles:
                     await self.bot.say("Only officers may perform this action")
@@ -31,7 +31,7 @@ class Delete:
             member.delete()
             await self.bot.say(codify(tabulate(info)))
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say(codify("Error deleting user"))
 
 

@@ -112,12 +112,12 @@ class Add:
 
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
-
+            logActivity('{} has added a character'.format(character.fam_name), user.name if user else author.name)
             await self.bot.say(codify("Success Adding Character for member {} :D\n\n".
                                       format(discord_user.name.upper()) + data))
 
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say("Something went horribly wrong")
 
     @commands.command(pass_context=True)
@@ -164,10 +164,11 @@ class Add:
                 row = get_row([character], False)
                 data = tabulate(row, HEADERS, 'simple')
 
+                logActivity('{} has rerolled character'.format(character.fam_name), author.name)
                 await self.bot.say(codify("Success Rerolling\n\n" + data))
 
             except Exception as e:
-                print(e)
+                print_error(e)
                 await self.bot.say("Could not reroll")
 
 def setup(bot):

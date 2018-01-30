@@ -1,5 +1,7 @@
 from discord.ext import commands
 from configparser import ConfigParser
+from models.activity import Activity
+import sys
 
 # The inital config.ini must be supplied in order to retrieve
 # basic information
@@ -127,3 +129,15 @@ async def check_character_name(bot, char_class):
         return False
 
     return True
+
+def print_error(error: Exception, message = 'Error'):
+    output = "{}\n\n{}".format(message, error)
+    print(output, file=sys.stderr)
+
+def logActivity(message: str, user: str):
+    try:
+        activity = Activity(message=message, user=user)
+        activity.save()
+    except Exception as e:
+        print_error(e)
+

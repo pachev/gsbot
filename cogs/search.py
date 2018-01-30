@@ -37,7 +37,7 @@ class Search:
                     await self.bot.say(page)
 
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say("Something went horribly wrong")
 
     @commands.command(pass_context=True)
@@ -66,7 +66,7 @@ class Search:
                 await self.bot.say(page)
 
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say("Something went horribly wrong")
 
 

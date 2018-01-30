@@ -30,7 +30,7 @@ class Listing:
                 await self.bot.say(page)
         except Exception as e:
             await self.bot.say("Something went horribly wrong")
-            print(e)
+            print_error(e)
 
     @commands.command(pass_context=True)
     async def over(self, ctx, num=400):
@@ -47,7 +47,7 @@ class Listing:
                 await self.bot.say(page)
 
         except Exception as e:
-            print(e)
+            print_error(e)
             await self.bot.say("Something went horribly wrong")
 
     @commands.command(pass_context=True)
@@ -62,7 +62,8 @@ class Listing:
 
             for page in paginate(data):
                 await self.bot.say(page)
-        except:
+        except Exception as e:
+            print_error(e)
             await self.bot.say("Something went horribly wrong")
 
     @commands.group(pass_context=True)
@@ -88,7 +89,7 @@ class Listing:
                 await self.bot.say(page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
-            print(e)
+            print_error(e)
 
     @sort_by.command(pass_context=True)
     async def ap(self, ctx, num=100):
@@ -105,7 +106,7 @@ class Listing:
                 await self.bot.say(page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
-            print(e)
+            print_error(e)
 
     @sort_by.command(pass_context=True)
     async def dp(self, ctx, num=100):
@@ -122,7 +123,7 @@ class Listing:
                 await self.bot.say(page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
-            print(e)
+            print_error(e)
 
 
 def setup(bot):
