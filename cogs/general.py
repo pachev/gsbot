@@ -41,7 +41,7 @@ class General:
 
             await self.bot.say(codify(data))
         except Exception as e:
-            print_error('Could not retrieve info' + e)
+            print(e)
             await self.bot.say("Could not retrieve info")
 
     @commands.command(pass_context=True)
@@ -57,7 +57,7 @@ class General:
                 wr.writerows(rows)
             await self.bot.upload('./members.csv')
         except Exception as e:
-            print_error('Could not export data\n\n' + e)
+            print(e)
             await self.bot.say("Something went horribly wrong")
 
 

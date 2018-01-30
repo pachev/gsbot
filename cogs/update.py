@@ -35,7 +35,7 @@ class Update:
 
             character = await self.__get_member(author, user, ctx.message.server.id)
             if character is None:
-                await self.bot.say('Could not update character. Are you sure the character is in the system?')
+                await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
                 return
 
             # Adds historical data to database
@@ -65,10 +65,10 @@ class Update:
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
 
-            await self.bot.say(codify('Updating {} was a great success :D\n\n'.format(character.fam_name.title()) + data))
+            await self.bot.say(codify('Updating {} was a great success :D\n\n'.format(fam_name) + data))
 
         except Exception as e:
-            print_error('Could not update user\n\n'+e)
+            print(e)
             await self.bot.say("Error updating user")
 
 

@@ -1,6 +1,5 @@
 from discord.ext import commands
 from configparser import ConfigParser
-import sys
 
 # The inital config.ini must be supplied in order to retrieve
 # basic information
@@ -15,7 +14,7 @@ DB_NAME = CONFIG.get('db', 'name')
 DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')
 DB_PASS = CONFIG.get('auth', 'pwd')
-TOKEN = CONFIG.get('auth', 'dev_token')
+TOKEN = CONFIG.get('auth', 'token')
 
 # User role that officer commands are checked against
 ADMIN_USER = 'Officers'
@@ -128,6 +127,3 @@ async def check_character_name(bot, char_class):
         return False
 
     return True
-
-def print_error(message: str):
-    print(message, file=sys.stderr)

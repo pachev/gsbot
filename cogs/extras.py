@@ -26,7 +26,7 @@ class Extras:
             character.save()
             await self.bot.say(codify("Picture added successfully"))
         except Exception as e:
-            print_error('Could not attach picture \n\n' + e)
+            print(e)
             await self.bot.say("Picture could not be added")
 
     @commands.command(pass_context=True)
@@ -45,7 +45,7 @@ class Extras:
                 await self.bot.say(page)
         except Exception as e:
             await self.bot.say("Something went horribly wrong")
-            print_error('Could not attach_pic' + e)
+            print(e)
 
     @commands.command(pass_context=True)
     async def set_main(self,ctx,num:int=0):
@@ -70,7 +70,7 @@ class Extras:
             await self.bot.say(codify('Main Character Switched Succesfuly to {}'.format(main.char_name)))
         except Exception as e:
             await self.bot.say("Something went horribly wrong")
-            print_error('Could not set main char\n\n' + e)
+            print(e)
 
 
 def setup(bot):
