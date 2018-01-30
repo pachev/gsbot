@@ -31,7 +31,7 @@ class Delete:
             member.delete()
             await self.bot.say(codify(tabulate(info)))
         except Exception as e:
-            print(e)
+            print_error('Could not delete\n\n' + e)
             await self.bot.say(codify("Error deleting user"))
 
 

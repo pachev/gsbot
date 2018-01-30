@@ -117,7 +117,7 @@ class Add:
                                       format(discord_user.name.upper()) + data))
 
         except Exception as e:
-            print(e)
+            print_error('Could not add user\n\n'+ e)
             await self.bot.say("Something went horribly wrong")
 
     @commands.command(pass_context=True)
@@ -167,7 +167,7 @@ class Add:
                 await self.bot.say(codify("Success Rerolling\n\n" + data))
 
             except Exception as e:
-                print(e)
+                print_error('Could not add reroll\n\n'+ e)
                 await self.bot.say("Could not reroll")
 
 def setup(bot):
