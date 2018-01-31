@@ -24,6 +24,7 @@ class Extras:
             character = Character.primary_chars(member = author.id).first()
             character.gear_pic = url
             character.save()
+            logActivity('{} has updated picture for {}'.format(character.fam_name.title(), character.char_name), ctx.message.author.name)
             await self.bot.say(codify("Picture added successfully"))
         except Exception as e:
             print(e)
@@ -67,6 +68,7 @@ class Extras:
             main = characters[num]
             main.primary = True
             main.save()
+            logActivity('{} has changed their main character'.format(main.char_name), ctx.message.author.name)
             await self.bot.say(codify('Main Character Switched Succesfuly to {}'.format(main.char_name)))
         except Exception as e:
             await self.bot.say("Something went horribly wrong")

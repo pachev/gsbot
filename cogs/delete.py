@@ -27,8 +27,9 @@ class Delete:
                 if ADMIN_USER not in roles:
                     await self.bot.say("Only officers may perform this action")
                     return
-            info = [["Success Deleting User"], ["Character", member.char_name], ["Family", member.fam_name]]
             member.delete()
+            info = [["Success Deleting User"], ["Character", member.char_name], ["Family", member.fam_name]]
+            logActivity('Character {} has been deleted'.format(member.char_name), author.name)
             await self.bot.say(codify(tabulate(info)))
         except Exception as e:
             print_error(e)
