@@ -41,14 +41,14 @@ class Add:
             server = Server.create({
                 'id': discord_server.id,
                 'name': discord_server.name,
-                'avatar': discord_server.avatar
+                'avatar': discord_server.icon_url or ''
             })
 
         if not member:
             member = Member.create({
                 'discord': discord_user.id,
                 'name': discord_user.name,
-                'avatar': discord_user.avatar
+                'avatar': discord_user.avatar_url or ''
             })
 
         # Checks if member being added is in the server
