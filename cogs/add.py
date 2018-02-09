@@ -164,7 +164,7 @@ class Add:
                 row = get_row([character], False)
                 data = tabulate(row, HEADERS, 'simple')
 
-                logActivity('{} has rerolled a character'.format(character.fam_name), author.name)
+                logActivity('{} has rerolled a character'.format(character.fam_name), ctx.message.author.name)
                 await self.bot.say(codify("Success Rerolling\n\n" + data))
 
             except Exception as e:
