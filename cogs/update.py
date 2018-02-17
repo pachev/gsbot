@@ -26,7 +26,7 @@ class Update:
         return character
 
     @commands.command(pass_context=True)
-    async def update(self, ctx, level: int, ap: int, dp: int, level_percent: float, user: discord.User = None):
+    async def update(self, ctx, level: int, ap: int, aap: int, dp: int, level_percent: float, user: discord.User = None):
         """Updates user's main character's gear score. **Officers can tag another user to update for them """
         date = datetime.now()
 
@@ -45,6 +45,7 @@ class Update:
                 'timestamp': date,
                 'level': float(str(character.level) + '.' + str(round(character.progress))) ,
                 'ap': character.ap,
+                'aap': character.aap,
                 'dp': character.dp,
                 'gear_score': character.gear_score
             })
@@ -53,10 +54,11 @@ class Update:
             historical_data.append(update)
 
             character.update_attributes({
-                'ap': ap, 
+                'ap': ap,
+                'aap': aap,
                 'dp': dp,
                 'level': level,
-                'gear_score': ap + dp,
+                'gear_score': aap + dp,
                 'progress': level_percent,
                 'updated': date,
                 'hist_data': historical_data

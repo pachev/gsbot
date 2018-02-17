@@ -13,8 +13,9 @@ class Character(Document, ModelMixin):
         'char_class', 
         'server',
         'level', 
-        'ap', 
-        'dp', 
+        'ap',
+        'aap',
+        'dp',
         'gear_score', 
         'updated', 
         'progress', 
@@ -29,7 +30,8 @@ class Character(Document, ModelMixin):
     char_name = StringField(max_lenght=50)
     char_class = StringField(max_lenght=50)
     level = IntField(max_lenght=4)
-    ap = IntField(max_lenght=5)
+    aap = IntField(max_lenght=5)
+    ap= IntField(max_lenght=5)
     dp = IntField(max_lenght=5)
     gear_score = IntField(max_lenght=10)
     updated = DateTimeField(default=datetime.now)

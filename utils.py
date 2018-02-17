@@ -16,7 +16,7 @@ DB_NAME = CONFIG.get('db', 'name')
 DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')
 DB_PASS = CONFIG.get('auth', 'pwd')
-TOKEN = CONFIG.get('auth', 'token')
+TOKEN = CONFIG.get('auth', 'dev_token')
 
 # User role that officer commands are checked against
 ADMIN_USER = 'Officers'
@@ -29,7 +29,7 @@ INITIAL_EXTENSIONS = ('cogs.add',
                       'cogs.update',
                       'cogs.extras')
 
-HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'DP', 'GS', 'Updated']
+HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'AAP', 'DP', 'GS']
 
 CHARACTER_CLASSES = [
     "MUSA",
@@ -77,9 +77,9 @@ def get_row(members, filter, num=-1):
                  u.level,
                  u.progress,
                  u.ap,
+                 u.aap,
                  u.dp,
-                 u.gear_score,
-                 u.updated.strftime('%D')]
+                 u.gear_score]
                 for u in members[:num]]
 
     return [[u.rank.title(),
@@ -89,9 +89,9 @@ def get_row(members, filter, num=-1):
              u.level,
              u.progress,
              u.ap,
+             u.aap,
              u.dp,
-             u.gear_score,
-             u.updated.strftime('%D')]
+             u.gear_score]
             for u in members]
 
 
