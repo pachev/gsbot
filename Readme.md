@@ -52,13 +52,22 @@ Then from the root of the project run:
 Once your dependencies are installed, there are a couple of steps you need to do before running.
 
 1. create a`config.ini` file inside of the main directory
-2. Setup config file like the example below:
+2. Setup config file like the example below: If you would like to give your
+users the ability to attach files directly when updating gear pictures, then
+create a [cloudinary][5] account and fill out the fields appropriately under 'cloudinary'
+settings
 
-```
+```ini
 [auth]  
 token = ... #This is where you put your bot token that you get from discord
 token2 = ...
 token3 = ...
+
+[cloudinary]
+has_cloud_storage = False
+cloud_name = some_name
+api_key = some_api_key
+api_secret = some_api_secret
 
 [db]
 name = gsbot
@@ -78,4 +87,5 @@ A python application using [discord.py][1]
 [1]: https://github.com/Rapptz/discord.py
 [2]: https://bots.discord.pw/
 [3]: https://docs.python.org/3/library/venv.html
-[4]: https://pip.pypa.io/en/latest/installing/ 
+[4]: https://pip.pypa.io/en/latest/installing/
+[5]: https://cloudinary.com/

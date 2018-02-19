@@ -1,14 +1,10 @@
 import traceback
 from mongoengine import *
 import sys
-
-from configparser import ConfigParser
-from tabulate import tabulate
-from datetime import datetime
-
 import asyncio
 import discord
 from discord.ext import commands
+from cloudinary import config
 
 from utils import *
 from models.character import Character
@@ -19,6 +15,14 @@ connect(DB_NAME,
         username=DB_USER,
         password=DB_PASS,
         authentication_source=DB_NAME)
+
+if HAS_CLOUD_STORAGE:
+    config(
+        cloud_name = CLOUD_NAME,
+        api_key = CLOUDINARY_API,
+        api_secret = CLOUDINARY_SECRET
+    )
+
 
 bot = commands.Bot(command_prefix='gsbot ', description=DESCRIPTION)
 

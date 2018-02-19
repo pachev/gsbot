@@ -24,3 +24,4 @@ six==1.10.0
 tabulate==0.7.7
 websockets==3.3
 wrapt==1.10.11
+cloudinary

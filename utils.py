@@ -17,6 +17,11 @@ DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')
 DB_PASS = CONFIG.get('auth', 'pwd')
 TOKEN = CONFIG.get('auth', 'dev_token')
+PIC_TAG = 'GEAR_PICS'
+HAS_CLOUD_STORAGE = CONFIG.getboolean('cloudinary', 'has_cloud_storage')
+CLOUD_NAME = CONFIG.get('cloudinary', 'cloud_name')
+CLOUDINARY_API = CONFIG.get('cloudinary', 'api_key')
+CLOUDINARY_SECRET = CONFIG.get('cloudinary', 'api_secret')
 
 # User role that officer commands are checked against
 ADMIN_USER = 'Officers'
@@ -133,6 +138,8 @@ async def check_character_name(bot, char_class):
 def print_error(error: Exception, message = 'Error'):
     output = "{}\n\n{}".format(message, error)
     print(output, file=sys.stderr)
+    sys.stderr.flush()
+
 
 def logActivity(message: str, user: str):
     try:
