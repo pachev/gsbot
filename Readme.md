@@ -7,7 +7,8 @@
 
 A python application to help manage guild members and their gear score for 
 Black Desert Online. This specific bot is made for Sazerac guild but can be
-adjusted for use with any other guild.
+adjusted for use with any other guild. The link to view this data visually
+is at [https://gsbot.pachevjoseph.com](https://gsbot.pachevjoseph.com)
 
 
 ### Requirements
