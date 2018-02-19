@@ -151,7 +151,7 @@ class Update:
 
     @update.command(pass_context=True)
     async def pic(self, ctx, url: str = None):
-        """Updates user's main character's gear pic. **Officers can tag another user to update for them """
+        """Updates user's main character's gear pic either attach a pic or type url"""
         attachments = ctx.message.attachments
         try:
             if url:
