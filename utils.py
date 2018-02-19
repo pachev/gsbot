@@ -16,7 +16,12 @@ DB_NAME = CONFIG.get('db', 'name')
 DB_HOST = CONFIG.get('db', 'host')
 DB_USER = CONFIG.get('auth', 'user')
 DB_PASS = CONFIG.get('auth', 'pwd')
-TOKEN = CONFIG.get('auth', 'token')
+TOKEN = CONFIG.get('auth', 'dev_token')
+PIC_TAG = 'GEAR_PICS'
+HAS_CLOUD_STORAGE = CONFIG.getboolean('cloudinary', 'has_cloud_storage')
+CLOUD_NAME = CONFIG.get('cloudinary', 'cloud_name')
+CLOUDINARY_API = CONFIG.get('cloudinary', 'api_key')
+CLOUDINARY_SECRET = CONFIG.get('cloudinary', 'api_secret')
 
 # User role that officer commands are checked against
 ADMIN_USER = 'Officers'
@@ -29,7 +34,7 @@ INITIAL_EXTENSIONS = ('cogs.add',
                       'cogs.update',
                       'cogs.extras')
 
-HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'DP', 'GS', 'Updated']
+HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'AAP', 'DP', 'GS']
 
 CHARACTER_CLASSES = [
     "MUSA",
@@ -77,9 +82,9 @@ def get_row(members, filter, num=-1):
                  u.level,
                  u.progress,
                  u.ap,
+                 u.aap,
                  u.dp,
-                 u.gear_score,
-                 u.updated.strftime('%D')]
+                 u.gear_score]
                 for u in members[:num]]
 
     return [[u.rank.title(),
@@ -89,9 +94,9 @@ def get_row(members, filter, num=-1):
              u.level,
              u.progress,
              u.ap,
+             u.aap,
              u.dp,
-             u.gear_score,
-             u.updated.strftime('%D')]
+             u.gear_score]
             for u in members]
 
 
@@ -133,6 +138,8 @@ async def check_character_name(bot, char_class):
 def print_error(error: Exception, message = 'Error'):
     output = "{}\n\n{}".format(message, error)
     print(output, file=sys.stderr)
+    sys.stderr.flush()
+
 
 def logActivity(message: str, user: str):
     try:

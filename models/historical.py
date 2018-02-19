@@ -11,6 +11,7 @@ class Historical(Document, ModelMixin):
         'timestamp',
         'level',
         'ap',
+        'aap',
         'dp',
         'gear_score'
     ]
@@ -19,6 +20,7 @@ class Historical(Document, ModelMixin):
     char_class = StringField(max_lenght=50)
     timestamp = DateTimeField(default=datetime.now)
     level = FloatField()
+    aap = IntField(max_lenght=5)
     ap = IntField(max_lenght=5)
     dp = IntField(max_lenght=5)
     gear_score = IntField(max_lenght=10)

@@ -68,6 +68,7 @@ class Add:
                   char_name,
                   level: int,
                   ap : int,
+                  aap : int,
                   dp: int,
                   char_class,
                   user: discord.User = None):
@@ -102,8 +103,9 @@ class Add:
                 'server': discord_server.id,
                 'level': level,
                 'ap': ap,
+                'aap': aap,
                 'dp': dp,
-                'gear_score': ap + dp,
+                'gear_score': aap + dp,
                 'primary': isPrimary,
                 'member': discord_user.id,
             })
@@ -121,7 +123,7 @@ class Add:
             await self.bot.say("Something went horribly wrong")
 
     @commands.command(pass_context=True)
-    async def reroll(self, ctx, new_char_name, level: int, ap : int, dp: int, new_char_class):
+    async def reroll(self, ctx, new_char_name, level: int, ap : int, aap: int, dp: int, new_char_class):
         """Just for someone special: Allows you to reroll your main character """
 
         author = ctx.message.author.id
@@ -143,6 +145,7 @@ class Add:
                     'timestamp': date,
                     'level':float(str(character.level) + '.' + str(round(character.progress))) ,
                     'ap': character.ap,
+                    'aap': character.aap,
                     'dp': character.dp,
                     'gear_score': character.gear_score
                 })
@@ -152,10 +155,11 @@ class Add:
 
                 character.update_attributes({
                     'char_name': new_char_name.upper(),
-                    'ap': ap, 
+                    'ap': ap,
+                    'aap': aap,
                     'dp': dp,
                     'level': level,
-                    'gear_score': ap + dp,
+                    'gear_score': aap + dp,
                     'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data
@@ -165,7 +169,8 @@ class Add:
                 data = tabulate(row, HEADERS, 'simple')
 
                 logActivity('{} has rerolled a character'.format(character.fam_name), ctx.message.author.name)
-                await self.bot.say(codify("Success Rerolling\n\n" + data))
+                reminder = '\n\nRemember to add a new pic with gsbot attach_pic!'
+                await self.bot.say(codify("Success Rerolling\n\n" + data + reminder ))
 
             except Exception as e:
                 print_error(e)

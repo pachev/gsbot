@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from tabulate import tabulate
 from datetime import datetime
+from cloudinary.uploader import upload
 
 from models.character import Character
 from utils import *
@@ -14,15 +15,25 @@ class Extras:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def attach_pic(self, ctx, url):
-        """ Command to attach a picture to your character.
-            When someone looks you up the attched picture
-            is displayed"""
-
+    async def attach_pic(self, ctx, url: str = None):
+        """ Command to attach a picture to your character. When someone looks you up the attached picture is displayed"""
         try:
             author = ctx.message.author
+            attachments = ctx.message.attachments
             character = Character.primary_chars(member = author.id).first()
-            character.gear_pic = url
+            if not character:
+                await self.bot.say('Could not find a main character for user {}'.format(author.name))
+                return
+
+            if url:
+                response = upload(url, tags=PIC_TAG)
+            else:
+                if not attachments:
+                    await self.bot.say('You must either attach a picture or provide a url')
+                    return
+                response = upload(attachments[0]['url'], tags=PIC_TAG)
+
+            character.gear_pic = response['url']
             character.save()
             logActivity('{} has updated picture for {}'.format(character.fam_name.title(), character.char_name), ctx.message.author.name)
             await self.bot.say(codify("Picture added successfully"))

@@ -109,6 +109,23 @@ class Listing:
             print_error(e)
 
     @sort_by.command(pass_context=True)
+    async def aap(self, ctx, num=100):
+        """ - Sorts list by awakened AP with optional limit"""
+        try:
+            members = Character.primary_chars(server=ctx.message.server.id).order_by('-aap')
+            rows = get_row(members, True, num)
+
+            data = tabulate(rows,
+                            HEADERS,
+                            'simple',)
+
+            for page in paginate(data):
+                await self.bot.say(page)
+        except Exception as e:
+            await self.bot.say("Could not retrieve list")
+            print_error(e)
+
+    @sort_by.command(pass_context=True)
     async def dp(self, ctx, num=100):
         """ - Sorts list by DP with optional limit"""
         try:
