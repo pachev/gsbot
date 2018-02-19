@@ -50,10 +50,24 @@ class Update:
                 await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
                 return
 
-            character.update_attributes({
-                attribute['name']: attribute['value'],
-                'updated': date,
-            })
+            if attribute['name'] == 'aap':
+                character.update_attributes({
+                    attribute['name']: attribute['value'],
+                    'gear_score':  attribute['value'] + character.dp,
+                    'updated': date,
+                })
+
+            elif attribute['name']  == 'dp':
+                character.update_attributes({
+                    attribute['name']: attribute['value'],
+                    'gear_score':  attribute['value'] + character.aap,
+                    'updated': date,
+                })
+            else:
+                character.update_attributes({
+                    attribute['name']: attribute['value'],
+                    'updated': date,
+                })
 
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
