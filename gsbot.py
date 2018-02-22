@@ -1,7 +1,6 @@
 import traceback
 from mongoengine import *
 import sys
-import asyncio
 import discord
 from discord.ext import commands
 from cloudinary import config
