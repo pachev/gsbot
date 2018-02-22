@@ -31,10 +31,11 @@ class Search:
                             'simple',)
 
             if members.count() == 1:
-                await self.bot.say(codify(data) +"\n" + members.first().gear_pic)
+                content = codify(data) +"\n" + members.first().gear_pic
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, content)
             else:
                 for page in paginate(data):
-                    await self.bot.say(page)
+                    await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
 
         except Exception as e:
             print_error(e)
@@ -63,7 +64,7 @@ class Search:
                             HEADERS,
                             'simple',)
             for page in paginate("Total Number of " + char_class + " on this server: " + str(count) + "\n\n" + data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
 
         except Exception as e:
             print_error(e)

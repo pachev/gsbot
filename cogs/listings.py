@@ -17,9 +17,7 @@ class Listing:
         Example. gsbot list returns first 100 by default  and gsbot list 5 first 5 sorted by
         gear score"""
         try:
-            print('server,', ctx.message.server.id)
             members = Character.primary_chars(server=ctx.message.server.id)
-            print(Character.objects().first().server)
             rows = get_row(members, True, num)
 
             data = tabulate(rows,
@@ -27,9 +25,9 @@ class Listing:
                            'simple',)
             
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
         except Exception as e:
-            await self.bot.say("Something went horribly wrong")
+            await self.bot.say(codify('Could not list members'))
             print_error(e)
 
     @commands.command(pass_context=True)
@@ -44,7 +42,7 @@ class Listing:
                            'simple',)
 
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
 
         except Exception as e:
             print_error(e)
@@ -61,7 +59,7 @@ class Listing:
                            'simple',)
 
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
         except Exception as e:
             print_error(e)
             await self.bot.say("Something went horribly wrong")
@@ -72,7 +70,7 @@ class Listing:
 
         # Checks if no sub-commands are invoked
         if ctx.invoked_subcommand is None:
-            await self.bot.say(codify("Sort by any category available(lvl, ap, dp). Try gsbot help sort_by"))
+            await self.bot.say(codify("Sort by any category available(lvl, ap, aap, dp). Try gsbot help sort_by"))
 
     @sort_by.command(pass_context=True)
     async def lvl(self, ctx, num=100):
@@ -86,7 +84,7 @@ class Listing:
                             'simple',)
 
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
             print_error(e)
@@ -103,7 +101,7 @@ class Listing:
                             'simple',)
 
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
             print_error(e)
@@ -120,7 +118,7 @@ class Listing:
                             'simple',)
 
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
             print_error(e)
@@ -137,7 +135,7 @@ class Listing:
                             'simple',)
 
             for page in paginate(data):
-                await self.bot.say(page)
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
         except Exception as e:
             await self.bot.say("Could not retrieve list")
             print_error(e)

@@ -4,6 +4,7 @@ from discord.ext import commands
 from tabulate import tabulate
 
 from models.character import Character
+from models.server_settings import ServerSettings
 from utils import *
 
 
@@ -55,10 +56,49 @@ class General:
             with open('./members.csv', 'w') as myfile:
                 wr = csv.writer(myfile)
                 wr.writerows(rows)
+
+            if is_officer_mode(ctx.message.server.id):
+                if is_user_officer(ctx.message.author.roles):
+                    await self.bot.send_file(ctx.message.author, 'members.csv', content=codify('Member info attached'))
+                    await self.bot.say(codify('File sent. Please check your private messages'))
+                    return
+                else:
+                    await self.bot.say(codify(OFFICER_MODE_MESSAGE))
+                    return
             await self.bot.upload('./members.csv')
         except Exception as e:
             print_error(e)
-            await self.bot.say("Something went horribly wrong")
+            await self.bot.say(codify('Could not export data'))
+
+    @commands.command(pass_context=True)
+    async def officer_mode(self, ctx, status: str):
+        """Turns officer mode on or off: Officer mode limits list and lookup to officers only"""
+
+        if status.lower() not in ['on', 'off']:
+            await self.bot.say(codify('Command only accepts on or off'))
+            return
+
+        server = ctx.message.server.id
+        roles = [r.name for r in ctx.message.author.roles]
+        officer_mode = True if status.lower() == 'on' else False
+        if ADMIN_USER not in roles:
+            await self.bot.say(codify('Only officers can perform this action'))
+            return
+
+        try:
+            server_setting = ServerSettings.objects(server=server).first()
+            if not server_setting:
+                setting = ServerSettings(server=server, officer_mode=officer_mode)
+                setting.save()
+            else:
+                server_setting.update(officer_mode=officer_mode)
+                server_setting.save()
+
+            logActivity('Server settings updated on {}'.format(ctx.message.server.name), ctx.message.author.name)
+            await self.bot.say(codify('Officer Mode successfuly changed to {}'.format(status)))
+        except Exception as e:
+            print_error(e)
+            await self.bot.say("Could not change officer mode to {}".format(status))
 
 
 def setup(bot):

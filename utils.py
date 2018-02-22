@@ -5,6 +5,8 @@ import sys
 
 # The inital config.ini must be supplied in order to retrieve
 # basic information
+from models.server_settings import ServerSettings
+
 CONFIG = ConfigParser(allow_no_value=True)
 CONFIG.read('config.ini')
 
@@ -147,4 +149,29 @@ def logActivity(message: str, user: str):
         activity.save()
     except Exception as e:
         print_error(e)
+
+OFFICER_MODE_MESSAGE = 'Only officers can request this information in officer mode.'
+CONTENT_SENT_MESSAGE = 'Content sent, please check your private messages.'
+
+def is_officer_mode(server: int):
+    setting = ServerSettings.objects(server=server).first()
+    if setting:
+        return setting.officer_mode
+    return False
+
+def is_user_officer(roles: list):
+    role_names = [r.name for r in roles]
+    return ADMIN_USER in role_names
+
+async def send_or_display(server:int, author, bot, content):
+    if is_officer_mode(server):
+        if is_user_officer(author.roles):
+            await bot.send_message(author, content)
+            return
+        else:
+           await bot.say(OFFICER_MODE_MESSAGE)
+           return
+
+    await bot.say(content)
+
 
