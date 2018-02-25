@@ -65,8 +65,8 @@ CHARACTER_CLASS_SHORT = {
     }
 
 DESCRIPTION = '''
-This the official Gear Score bot.
-Made by drawven(drawven@gmail.com)
+This the official Gear Score bot. For visual data go to: https://gsbot.pachevjoseph.com
+For issues/suggestions email me: pachevjoseph@gmail.com
 '''
 
 

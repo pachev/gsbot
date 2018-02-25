@@ -153,6 +153,7 @@ class Update:
     async def pic(self, ctx, url: str = None):
         """Updates user's main character's gear pic either attach a pic or type url"""
         attachments = ctx.message.attachments
+        # TODO: Add fallback if cloudinary account is not enabled in configuration
         try:
             if url:
                 response = upload(url, tags=PIC_TAG)
