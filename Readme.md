@@ -1,4 +1,6 @@
 # Gear Score Bot for Black Desert Online
+[![Travis Build](https://travis-ci.org/pachev/gsbot.svg?branch=master)]()
+[![Discord Server](https://img.shields.io/discord/417173590757212162.svg)](https://discord.gg/STa7Ebz)
 
 #### [A Discord Bot][2]
 
