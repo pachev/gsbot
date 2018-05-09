@@ -53,14 +53,21 @@ class Update:
             if attribute['name'] == 'aap':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
-                    'gear_score':  attribute['value'] + character.dp,
+                    'gear_score':  max(character.ap, attribute['value']) + character.dp,
+                    'updated': date,
+                })
+
+            elif attribute['name'] == 'ap':
+                character.update_attributes({
+                    attribute['name']: attribute['value'],
+                    'gear_score': max(attribute['value'], character.aap) + character.dp,
                     'updated': date,
                 })
 
             elif attribute['name']  == 'dp':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
-                    'gear_score':  attribute['value'] + character.aap,
+                    'gear_score':  attribute['value'] + max(character.aap, character.ap),
                     'updated': date,
                 })
             else:
@@ -109,7 +116,7 @@ class Update:
                 'aap': aap,
                 'dp': dp,
                 'level': level,
-                'gear_score': aap + dp,
+                'gear_score': max(aap, ap) + dp,
                 'progress': level_percent,
                 'updated': date,
                 'hist_data': historical_data
