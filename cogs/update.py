@@ -16,16 +16,19 @@ class Update:
         self.bot = bot
 
     async def __get_member(self, author, user, server_id):
+        author_roles = [u.name for u in author.roles]
+        user_roles = [u.name for u in user.roles] if user else []
         if not user:
             character = Character.primary_chars(member = author.id).first()
+            rank = 'Officer' if ADMIN_USER in author_roles else 'Member'
         else:
             character = Character.primary_chars(member = user.id, server = server_id).first()
-            roles = [u.name for u in author.roles]
-            if ADMIN_USER not in roles:
+            rank = 'Officer' if ADMIN_USER in user_roles else 'Member'
+            if ADMIN_USER not in author_roles:
                 await self.bot.say("Only officers may perform this action")
                 return
         
-        return character
+        return (rank, character)
 
     def __create_historical(self, character, date: datetime):
         update = Historical.create({
@@ -45,7 +48,7 @@ class Update:
         date = datetime.now()
         try:
             author = ctx.message.author
-            character = await self.__get_member(author, user, ctx.message.server.id)
+            rank, character = await self.__get_member(author, user, ctx.message.server.id)
             if character is None:
                 await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
                 return
@@ -62,6 +65,7 @@ class Update:
                     attribute['name']: attribute['value'],
                     'gear_score': max(attribute['value'], character.aap) + character.dp,
                     'updated': date,
+                    'rank': rank,
                 })
 
             elif attribute['name']  == 'dp':
@@ -69,11 +73,13 @@ class Update:
                     attribute['name']: attribute['value'],
                     'gear_score':  attribute['value'] + max(character.aap, character.ap),
                     'updated': date,
+                    'rank': rank,
                 })
             else:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'updated': date,
+                    'rank': rank,
                 })
 
             row = get_row([character], False)
@@ -101,7 +107,7 @@ class Update:
 
         try:
             author = ctx.message.author
-            character = await self.__get_member(author, user, ctx.message.server.id)
+            rank, character = await self.__get_member(author, user, ctx.message.server.id)
             if character is None:
                 await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
                 return
