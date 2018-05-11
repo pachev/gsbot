@@ -105,7 +105,7 @@ class Add:
                 'ap': ap,
                 'aap': aap,
                 'dp': dp,
-                'gear_score': aap + dp,
+                'gear_score': max(aap, ap) + dp,
                 'primary': isPrimary,
                 'member': discord_user.id,
             })
@@ -159,7 +159,7 @@ class Add:
                     'aap': aap,
                     'dp': dp,
                     'level': level,
-                    'gear_score': aap + dp,
+                    'gear_score': max(aap, ap) + dp,
                     'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data
