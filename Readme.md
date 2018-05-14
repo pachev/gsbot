@@ -61,10 +61,10 @@ create a [cloudinary][5] account and fill out the fields appropriately under 'cl
 settings
 
 ```ini
-[auth]  
+[auth]
 token = ... #This is where you put your bot token that you get from discord
-token2 = ...
-token3 = ...
+user = user
+pwd = pwd
 
 [cloudinary]
 has_cloud_storage = False
@@ -75,10 +75,15 @@ api_secret = some_api_secret
 [db]
 name = gsbot
 port = 27017
-collection = gsdata
+host = localhost
+character_collection = character
+server_collection = server
+member_collection = member
+historical_collection = historical
 ```
 
-3. Have an instance of mongodb running. The bot, as it stands, is configured to connect to 
+3. Have an instance of mongodb running with the a db that has the same name
+that is inside of the config file. The bot, as it stands, is configured to connect to
 a localhost instance of mongo on port 27017. If you would like different configurations,
 make sure you change the config file accordingly.
 
