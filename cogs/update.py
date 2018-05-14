@@ -8,6 +8,7 @@ from cloudinary.uploader import upload
 from models.character import Character
 from models.historical import Historical
 from utils import *
+import math
 
 class Update:
     """Update commands."""
@@ -39,7 +40,8 @@ class Update:
             'ap': character.ap,
             'aap': character.aap,
             'dp': character.dp,
-            'gear_score': character.gear_score
+            'gear_score': character.gear_score,
+            'renown_score': character.renown_score
         })
         return update
 
@@ -57,13 +59,16 @@ class Update:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score':  max(character.ap, attribute['value']) + character.dp,
+                    'renown_score': math.trunc((character.ap+attribute['value'])/2 + character.dp),
                     'updated': date,
+                    'rank': rank,
                 })
 
             elif attribute['name'] == 'ap':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score': max(attribute['value'], character.aap) + character.dp,
+                    'renown_score': math.trunc((attribute['value']+character.aap)/2 + character.dp),
                     'updated': date,
                     'rank': rank,
                 })
@@ -72,6 +77,7 @@ class Update:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score':  attribute['value'] + max(character.aap, character.ap),
+                    'renown_score': math.trunc((character.ap+character.aap)/2 + attribute['value']),
                     'updated': date,
                     'rank': rank,
                 })
@@ -123,6 +129,7 @@ class Update:
                 'dp': dp,
                 'level': level,
                 'gear_score': max(aap, ap) + dp,
+                'renown_score': math.trunc((ap+aap)/2 + dp),
                 'progress': level_percent,
                 'updated': date,
                 'hist_data': historical_data

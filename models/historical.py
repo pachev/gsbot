@@ -13,17 +13,19 @@ class Historical(Document, ModelMixin):
         'ap',
         'aap',
         'dp',
-        'gear_score'
+        'gear_score',
+        'renown_score',
     ]
 
-    type = StringField(max_lenght=50)
-    char_class = StringField(max_lenght=50)
+    type = StringField(max_length=50)
+    char_class = StringField(max_length=50)
     timestamp = DateTimeField(default=datetime.now)
     level = FloatField()
-    aap = IntField(max_lenght=5)
-    ap = IntField(max_lenght=5)
-    dp = IntField(max_lenght=5)
-    gear_score = IntField(max_lenght=10)
+    aap = IntField(max_length=5)
+    ap = IntField(max_length=5)
+    dp = IntField(max_length=5)
+    gear_score = IntField(max_length=10)
+    renown_score = IntField(max_length=10)
     meta = {
         'collection' : HIST_COLLECTION,
     }

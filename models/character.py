@@ -16,7 +16,8 @@ class Character(Document, ModelMixin):
         'ap',
         'aap',
         'dp',
-        'gear_score', 
+        'gear_score',
+        'renown_score', 
         'updated', 
         'progress', 
         'gear_pic', 
@@ -25,15 +26,16 @@ class Character(Document, ModelMixin):
         'hist_data'
     ]
 
-    rank = StringField(max_lenght=50)
-    fam_name = StringField(max_lenght=50)
-    char_name = StringField(max_lenght=50)
-    char_class = StringField(max_lenght=50)
-    level = IntField(max_lenght=4)
-    aap = IntField(max_lenght=5)
-    ap= IntField(max_lenght=5)
-    dp = IntField(max_lenght=5)
-    gear_score = IntField(max_lenght=10)
+    rank = StringField(max_length=50)
+    fam_name = StringField(max_length=50)
+    char_name = StringField(max_length=50)
+    char_class = StringField(max_length=50)
+    level = IntField(max_length=4)
+    aap = IntField(max_length=5)
+    ap= IntField(max_length=5)
+    dp = IntField(max_length=5)
+    gear_score = IntField(max_length=10)
+    renown_score = IntField(max_length=10)
     updated = DateTimeField(default=datetime.now)
     progress = FloatField(default=0.0)
     gear_pic = URLField(default="https://i.imgur.com/UFViCXj.jpg")

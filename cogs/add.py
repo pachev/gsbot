@@ -75,7 +75,7 @@ class Add:
         """Adds your primary character to the guild. This character is linked with your
         discord id and can only be updated by either that member or an officer.
         **Officers can add a user by tagging them at the end. eg @drawven**
-        Note: Total gear score and rank is auto calculated."""
+        Note: Total gear score, renown score, and rank are auto calculated."""
 
         # Checks character name to make sure it is correct
         try:
@@ -106,6 +106,7 @@ class Add:
                 'aap': aap,
                 'dp': dp,
                 'gear_score': max(aap, ap) + dp,
+                'renown_score': int((ap+aap)/2 + dp),
                 'primary': isPrimary,
                 'member': discord_user.id,
             })
@@ -147,7 +148,8 @@ class Add:
                     'ap': character.ap,
                     'aap': character.aap,
                     'dp': character.dp,
-                    'gear_score': character.gear_score
+                    'gear_score': character.gear_score,
+                    'renown_score': character.renown_score,
                 })
 
                 historical_data = character.hist_data
@@ -160,6 +162,7 @@ class Add:
                     'dp': dp,
                     'level': level,
                     'gear_score': max(aap, ap) + dp,
+                    'renown_score': int((ap+aap)/2 + dp),
                     'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data
