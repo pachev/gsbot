@@ -44,7 +44,7 @@ class Update:
         return update
 
 
-    async def update_attribute(self, ctx, attribute, user: discord.user = None):
+    async def update_attribute(self, ctx, attribute, user: discord.User = None):
         date = datetime.now()
         try:
             author = ctx.message.author
@@ -138,27 +138,27 @@ class Update:
             await self.bot.say("Error updating user")
 
     @update.command(pass_context=True)
-    async def ap(self, ctx, ap: int, user: discord.user = None):
+    async def ap(self, ctx, ap: int, user: discord.User = None):
         """Updates user's main character's ap. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'ap', 'value': ap}, user)
 
     @update.command(pass_context=True)
-    async def aap(self, ctx, aap: int, user: discord.user = None):
+    async def aap(self, ctx, aap: int, user: discord.User = None):
         """Updates user's main character's aap. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'aap', 'value': aap}, user)
 
     @update.command(pass_context=True)
-    async def dp(self, ctx, dp: int, user: discord.user = None):
+    async def dp(self, ctx, dp: int, user: discord.User = None):
         """Updates user's main character's dp. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'dp', 'value': dp}, user)
 
     @update.command(pass_context=True)
-    async def lvl(self, ctx, level: int, user: discord.user = None):
+    async def lvl(self, ctx, level: int, user: discord.User = None):
         """Updates user's main character's level. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'level', 'value': level}, user)
 
     @update.command(pass_context=True)
-    async def progress(self, ctx, percent: float, user: discord.user = None):
+    async def progress(self, ctx, percent: float, user: discord.User = None):
         """Updates user's main character's level progress. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'progress', 'value': percent}, user)
 
