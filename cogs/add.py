@@ -8,6 +8,7 @@ from models.member import Member
 from models.historical import Historical
 from models.server import Server
 from utils import *
+import math
 
 class Add:
     """Add commands."""
@@ -106,7 +107,7 @@ class Add:
                 'aap': aap,
                 'dp': dp,
                 'gear_score': max(aap, ap) + dp,
-                'renown_score': int((ap+aap)/2 + dp),
+                'renown_score': math.trunc((ap+aap)/2 + dp),
                 'primary': isPrimary,
                 'member': discord_user.id,
             })
