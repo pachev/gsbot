@@ -13,7 +13,8 @@ class Historical(Document, ModelMixin):
         'ap',
         'aap',
         'dp',
-        'gear_score'
+        'gear_score',
+        'renown_score',
     ]
 
     type = StringField(max_length=50)
@@ -24,6 +25,7 @@ class Historical(Document, ModelMixin):
     ap = IntField(max_length=5)
     dp = IntField(max_length=5)
     gear_score = IntField(max_length=10)
+    renown_score = IntField(max_length=10)
     meta = {
         'collection' : HIST_COLLECTION,
     }
