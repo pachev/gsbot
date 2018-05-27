@@ -54,6 +54,7 @@ CHARACTER_CLASSES = [
     "WARRIOR",
     "WITCH",
     "WIZARD",
+    "LAHN",
 ]
 
 CHARACTER_CLASS_SHORT = {
