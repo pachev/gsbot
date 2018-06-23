@@ -140,6 +140,23 @@ class Listing:
             await self.bot.say("Could not retrieve list")
             print_error(e)
 
+    @sort_by.command(pass_context=True)
+    async def rs(self, ctx, num=100):
+        """ - Sorts list by RS (renown score) with optional limit"""
+        try:
+            members = Character.primary_chars(server=ctx.message.server.id).order_by('-renown_score')
+            rows = get_row(members, True, num)
+
+            data = tabulate(rows,
+                            HEADERS,
+                            'simple',)
+
+            for page in paginate(data):
+                await send_or_display(ctx.message.server.id, ctx.message.author, self.bot, page)
+        except Exception as e:
+            await self.bot.say("Could not retrieve list")
+            print_error(e)
+
 
 def setup(bot):
     bot.add_cog(Listing(bot))

@@ -16,7 +16,7 @@ class General:
 
     @commands.command(pass_context=True)
     async def info(self, ctx):
-        """List important gear score info. Lowest, highest, average, newest(not yet), oldest,
+        """List important gear score info. Lowest, highest_gs, average, newest(not yet), oldest,
         total users, total officers, total members"""
 
         try:
@@ -24,15 +24,31 @@ class General:
             members = Character.primary_chars(server=ctx.message.server.id)
             if members:
                 officers = members(rank='Officer')
-                average = members.average('gear_score')
-                lowest = members.order_by('+gear_score').first()
-                highest = members[0]
+                average_gs = members.average('gear_score')
+                lowest_gs = members.order_by('+gear_score').first()
+                highest_gs = members.first()
+                average_rs = members.average('renown_score')
+                lowest_rs = members.order_by('+renown_score').first()
+                highest_rs = members.order_by('-renown_score').first()
                 count = members.count()
                 officer_count = officers.count()
                 member_count = count - officer_count
-                info.append(['Average', round(average,2)])
-                info.append(['Lowest', lowest.gear_score, lowest.fam_name.title(), lowest.char_name.title()])
-                info.append(['Highest', highest.gear_score, highest.fam_name.title(), highest.char_name.title()])
+                info.append([' Gear Score '])
+                info.append(['-------------------------'])
+                info.append(['Average', round(average_gs,2)])
+                info.append(['Lowest', lowest_gs.gear_score, lowest_gs.fam_name.title(), lowest_gs.char_name.title()])
+                info.append(['Highest', highest_gs.gear_score, highest_gs.fam_name.title(), highest_gs.char_name.title()])
+                info.append([''])
+                info.append(['-------------------------'])
+                info.append(['Renown Score '])
+                info.append(['-------------------------'])
+                info.append(['Average', round(average_rs,2)])
+                info.append(['Lowest', lowest_rs.gear_score, lowest_rs.fam_name.title(), lowest_rs.char_name.title()])
+                info.append(['Highest', highest_rs.gear_score, highest_rs.fam_name.title(), highest_rs.char_name.title()])
+                info.append([''])
+                info.append(['-------------------------'])
+                info.append(['Counts '])
+                info.append(['-------------------------'])
                 info.append(['Total Officers', officer_count])
                 info.append(['Total Members', member_count])
                 info.append(['Guild Total', count])
