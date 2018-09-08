@@ -55,11 +55,12 @@ class Update:
                 await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
                 return
 
+            fame = character.fame
             if attribute['name'] == 'aap':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score':  max(character.ap, attribute['value']) + character.dp,
-                    'renown_score': math.trunc((character.ap+attribute['value'])/2 + character.dp),
+                    'renown_score': math.trunc((character.ap+attribute['value'])/2 + character.dp) + fame,
                     'updated': date,
                     'rank': rank,
                 })
@@ -68,7 +69,7 @@ class Update:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score': max(attribute['value'], character.aap) + character.dp,
-                    'renown_score': math.trunc((attribute['value']+character.aap)/2 + character.dp),
+                    'renown_score': math.trunc((attribute['value']+character.aap)/2 + character.dp) + fame,
                     'updated': date,
                     'rank': rank,
                 })
@@ -77,7 +78,14 @@ class Update:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score':  attribute['value'] + max(character.aap, character.ap),
-                    'renown_score': math.trunc((character.ap+character.aap)/2 + attribute['value']),
+                    'renown_score': math.trunc((character.ap+character.aap)/2 + attribute['value']) + fame,
+                    'updated': date,
+                    'rank': rank,
+                })
+            elif attribute['name']  == 'fame':
+                character.update_attributes({
+                    attribute['name']: attribute['value'],
+                    'renown_score': math.trunc((character.ap+character.aap)/2 + character.dp) + attribute['value'],
                     'updated': date,
                     'rank': rank,
                 })
@@ -95,7 +103,7 @@ class Update:
 
         except Exception as e:
             print_error(e)
-            await self.bot.say("Error updating character")
+            await self.bot.say(codify("Error updating character"))
 
     @commands.group(pass_context=True)
     async def update(self, ctx):
@@ -168,6 +176,11 @@ class Update:
     async def progress(self, ctx, percent: float, user: discord.User = None):
         """Updates user's main character's level progress. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'progress', 'value': percent}, user)
+
+    @update.command(pass_context=True)
+    async def fame(self, ctx, fame: int, user: discord.User = None):
+        """Updates user's main character's fame. **Officers can tag another user to update for them """
+        await self.update_attribute(ctx, {'name': 'fame', 'value': fame}, user)
 
     @update.command(pass_context=True)
     async def pic(self, ctx, url: str = None):

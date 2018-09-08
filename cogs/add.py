@@ -154,6 +154,7 @@ class Add:
                 })
 
                 historical_data = character.hist_data
+                fame = character.fame or 0
                 historical_data.append(update)
 
                 character.update_attributes({
@@ -163,7 +164,7 @@ class Add:
                     'dp': dp,
                     'level': level,
                     'gear_score': max(aap, ap) + dp,
-                    'renown_score': math.trunc((ap+aap)/2 + dp),
+                    'renown_score': math.trunc((ap+aap)/2 + dp) + fame,
                     'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data

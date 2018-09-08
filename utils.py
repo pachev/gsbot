@@ -36,7 +36,7 @@ INITIAL_EXTENSIONS = ('cogs.add',
                       'cogs.update',
                       'cogs.extras')
 
-HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'AAP', 'DP', 'GS', 'RS']
+HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'AAP', 'DP', 'GS', 'RS', 'Fame']
 
 CHARACTER_CLASSES = [
     "MUSA",
@@ -88,7 +88,8 @@ def get_row(members, filter, num=-1):
                  u.aap,
                  u.dp,
                  u.gear_score,
-                 u.renown_score]
+                 u.renown_score,
+                 u.fame]
                 for u in members[:num]]
 
     return [[u.rank.title(),
@@ -101,7 +102,8 @@ def get_row(members, filter, num=-1):
              u.aap,
              u.dp,
              u.gear_score,
-             u.renown_score]
+             u.renown_score,
+             u.fame]
             for u in members]
 
 
