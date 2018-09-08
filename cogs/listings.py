@@ -159,7 +159,7 @@ class Listing:
 
 
     @sort_by.command(pass_context=True)
-    async def rs(self, ctx, num=100):
+    async def fame(self, ctx, num=100):
         """ - Sorts list by Fame (as it relates to renown score) with optional limit"""
         try:
             members = Character.primary_chars(server=ctx.message.server.id).order_by('-fame')
