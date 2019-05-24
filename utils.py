@@ -36,7 +36,7 @@ INITIAL_EXTENSIONS = ('cogs.add',
                       'cogs.update',
                       'cogs.extras')
 
-HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'AAP', 'DP', 'GS', 'RS', 'Fame']
+HEADERS = ['Rank', 'Fam', 'Char', 'Class', 'Lvl', ' % ', 'AP', 'AAP', 'DP', 'GS', 'Updated']
 
 CHARACTER_CLASSES = [
     "MUSA",
@@ -64,7 +64,7 @@ CHARACTER_CLASS_SHORT = {
     "KUNO": "KUNOICHI",
     "SORC": "SORCERESS",
     "VALK": "VALKYRIE",
-    }
+}
 
 DESCRIPTION = '''
 This the official Gear Score bot. For visual data go to: https://gsbot.pachevjoseph.com
@@ -89,8 +89,7 @@ def get_row(members, filter, num=-1):
                  u.aap,
                  u.dp,
                  u.gear_score,
-                 u.renown_score,
-                 u.fame]
+                 u.updated.strftime('%x')]
                 for u in members[:num]]
 
     return [[u.rank.title(),
@@ -103,8 +102,7 @@ def get_row(members, filter, num=-1):
              u.aap,
              u.dp,
              u.gear_score,
-             u.renown_score,
-             u.fame]
+             u.updated.strftime('%x')]
             for u in members]
 
 
@@ -114,9 +112,11 @@ def paginate(data):
         paginator.add_line(i)
     return paginator.pages
 
+
 async def check_character_name(bot, char_class):
     # if char_class is shorthand for a class name (EX. DK = DARKKNIGHT) then set it to the real name
-    char_class = CHARACTER_CLASS_SHORT.get(char_class.upper()) if CHARACTER_CLASS_SHORT.get(char_class.upper()) else char_class
+    char_class = CHARACTER_CLASS_SHORT.get(char_class.upper()) if CHARACTER_CLASS_SHORT.get(
+        char_class.upper()) else char_class
 
     # check for invalid class names
     if char_class.upper() not in CHARACTER_CLASSES:
@@ -127,13 +127,13 @@ async def check_character_name(bot, char_class):
         ))
         if len(possible_classes) > 1:
             await bot.say(codify("Character class not recognized.\n"
-                                      "Did you mean {}?".format(", ".join(
+                                 "Did you mean {}?".format(", ".join(
                 possible_classes[:-1]) + " or " + possible_classes[-1])
-                                      ))
+                                 ))
         elif len(possible_classes) == 1:
             await bot.say(codify("Character class not recognized.\n"
-                                      "Did you mean {}?".format(possible_classes[0])
-                                      ))
+                                 "Did you mean {}?".format(possible_classes[0])
+                                 ))
         else:
             await bot.say(
                 codify("Character class not recognized, here is a list "
@@ -143,7 +143,8 @@ async def check_character_name(bot, char_class):
 
     return True
 
-def print_error(error: Exception, message = 'Error'):
+
+def print_error(error: Exception, message='Error'):
     output = "{}\n\n{}".format(message, error)
     print(output, file=sys.stderr)
     sys.stderr.flush()
@@ -156,8 +157,10 @@ def logActivity(message: str, user: str):
     except Exception as e:
         print_error(e)
 
+
 OFFICER_MODE_MESSAGE = 'Only officers can request this information in officer mode.'
 CONTENT_SENT_MESSAGE = 'Content sent, please check your private messages.'
+
 
 def is_officer_mode(server: int):
     setting = ServerSettings.objects(server=server).first()
@@ -165,19 +168,19 @@ def is_officer_mode(server: int):
         return setting.officer_mode
     return False
 
+
 def is_user_officer(roles: list):
     role_names = [r.name for r in roles]
     return ADMIN_USER in role_names
 
-async def send_or_display(server:int, author, bot, content):
+
+async def send_or_display(server: int, author, bot, content):
     if is_officer_mode(server):
         if is_user_officer(author.roles):
             await bot.send_message(author, content)
             return
         else:
-           await bot.say(OFFICER_MODE_MESSAGE)
-           return
+            await bot.say(OFFICER_MODE_MESSAGE)
+            return
 
     await bot.say(content)
-
-
