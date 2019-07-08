@@ -56,6 +56,7 @@ CHARACTER_CLASSES = [
     "WIZARD",
     "LAHN",
     "ARCHER",
+    "SHAI",
 ]
 
 CHARACTER_CLASS_SHORT = {
