@@ -8,7 +8,7 @@ from models.server_settings import ServerSettings
 from utils import *
 
 
-class General:
+class General(commands.Cog):
     """General commands."""
 
     def __init__(self, bot):
@@ -21,7 +21,7 @@ class General:
 
         try:
             info = []
-            members = Character.primary_chars(server=ctx.message.server.id)
+            members = Character.primary_chars(server=ctx.message.guild.id)
             if members:
                 officers = members(rank='Officer')
                 average_gs = members.average('gear_score')
@@ -46,16 +46,16 @@ class General:
             else:
                 data = "No members yet to display info. Try adding some members :D"
 
-            await self.bot.say(codify(data))
+            await ctx.send(codify(data))
         except Exception as e:
             print(e)
-            await self.bot.say("Could not retrieve info")
+            await ctx.send("Could not retrieve info")
 
     @commands.command(pass_context=True)
     async def export(self, ctx):
         """Exports current guild data"""
 
-        members = Character.primary_chars(server=ctx.message.server.id)
+        members = Character.primary_chars(server=ctx.message.guild.id)
         rows = get_row(members, False)
         rows.insert(0, HEADERS)
         try:
@@ -63,32 +63,32 @@ class General:
                 wr = csv.writer(myfile)
                 wr.writerows(rows)
 
-            if is_officer_mode(ctx.message.server.id):
+            if is_officer_mode(ctx.message.guild.id):
                 if is_user_officer(ctx.message.author.roles):
-                    await self.bot.send_file(ctx.message.author, 'members.csv', content=codify('Member info attached'))
-                    await self.bot.say(codify('File sent. Please check your private messages'))
+                    await ctx.message.author.send('members.csv', file=discord.File('members.csv'))
+                    await ctx.send(codify('File sent. Please check your private messages'))
                     return
                 else:
-                    await self.bot.say(codify(OFFICER_MODE_MESSAGE))
+                    await ctx.send(codify(OFFICER_MODE_MESSAGE))
                     return
-            await self.bot.upload('./members.csv')
+            await ctx.send('Export', file=discord.File('./members.csv'))
         except Exception as e:
             print_error(e)
-            await self.bot.say(codify('Could not export data'))
+            await ctx.send(codify('Could not export data'))
 
     @commands.command(pass_context=True)
     async def officer_mode(self, ctx, status: str):
         """Turns officer mode on or off: Officer mode limits list and lookup to officers only"""
 
         if status.lower() not in ['on', 'off']:
-            await self.bot.say(codify('Command only accepts on or off'))
+            await ctx.send(codify('Command only accepts on or off'))
             return
 
-        server = ctx.message.server.id
+        server = ctx.message.guild.id
         roles = [r.name for r in ctx.message.author.roles]
         officer_mode = True if status.lower() == 'on' else False
         if ADMIN_USER not in roles:
-            await self.bot.say(codify('Only officers can perform this action'))
+            await ctx.send(codify('Only officers can perform this action'))
             return
 
         try:
@@ -100,11 +100,11 @@ class General:
                 server_setting.update(officer_mode=officer_mode)
                 server_setting.save()
 
-            logActivity('Server settings updated on {}'.format(ctx.message.server.name), ctx.message.author.name)
-            await self.bot.say(codify('Officer Mode successfuly changed to {}'.format(status)))
+            logActivity('Server settings updated on {}'.format(ctx.message.guild.name), ctx.message.author.name)
+            await ctx.send(codify('Officer Mode successfuly changed to {}'.format(status)))
         except Exception as e:
             print_error(e)
-            await self.bot.say("Could not change officer mode to {}".format(status))
+            await ctx.send("Could not change officer mode to {}".format(status))
 
 
 def setup(bot):

@@ -69,8 +69,11 @@ CHARACTER_CLASS_SHORT = {
 }
 
 DESCRIPTION = '''
-This the official Gear Score bot. For visual data go to: https://gsbot.pachevjoseph.com
-For issues/suggestions email me: pachevjoseph@gmail.com
+https://discord.gg/B8My2zw
+
+This the official Gear Score bot for Black Desert Online. 
+For visual data go to: https://gsbot.pachevjoseph.com
+For issues/suggestions email me: pachevjoseph@gmail.com. 
 '''
 
 
@@ -115,7 +118,7 @@ def paginate(data):
     return paginator.pages
 
 
-async def check_character_name(bot, char_class):
+async def check_character_name(ctx, char_class):
     # if char_class is shorthand for a class name (EX. DK = DARKKNIGHT) then set it to the real name
     char_class = CHARACTER_CLASS_SHORT.get(char_class.upper()) if CHARACTER_CLASS_SHORT.get(
         char_class.upper()) else char_class
@@ -128,16 +131,16 @@ async def check_character_name(bot, char_class):
             CHARACTER_CLASSES,
         ))
         if len(possible_classes) > 1:
-            await bot.say(codify("Character class not recognized.\n"
+            await ctx.send(codify("Character class not recognized.\n"
                                  "Did you mean {}?".format(", ".join(
                 possible_classes[:-1]) + " or " + possible_classes[-1])
                                  ))
         elif len(possible_classes) == 1:
-            await bot.say(codify("Character class not recognized.\n"
+            await ctx.send(codify("Character class not recognized.\n"
                                  "Did you mean {}?".format(possible_classes[0])
                                  ))
         else:
-            await bot.say(
+            await ctx.send(
                 codify("Character class not recognized, here is a list "
                        "of recognized classes\n "
                        + "\n ".join(CHARACTER_CLASSES)))
@@ -176,13 +179,13 @@ def is_user_officer(roles: list):
     return ADMIN_USER in role_names
 
 
-async def send_or_display(server: int, author, bot, content):
+async def send_or_display(server: int, author, ctx, content):
     if is_officer_mode(server):
         if is_user_officer(author.roles):
-            await bot.send_message(author, content)
+            await ctx.author.send(content)
             return
         else:
-            await bot.say(OFFICER_MODE_MESSAGE)
+            await ctx.send(OFFICER_MODE_MESSAGE)
             return
 
-    await bot.say(content)
+    await ctx.send(content)

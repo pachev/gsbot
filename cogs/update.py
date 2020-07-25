@@ -10,7 +10,7 @@ from models.historical import Historical
 from utils import *
 import math
 
-class Update:
+class Update(commands.Cog):
     """Update commands."""
 
     def __init__(self, bot):
@@ -26,7 +26,7 @@ class Update:
             character = Character.primary_chars(member = user.id, server = server_id).first()
             rank = 'Officer' if ADMIN_USER in user_roles else 'Member'
             if ADMIN_USER not in author_roles:
-                await self.bot.say("Only officers may perform this action")
+                await ctx.send("Only officers may perform this action")
                 return
         
         return (rank, character)
@@ -50,9 +50,9 @@ class Update:
         date = datetime.now()
         try:
             author = ctx.message.author
-            rank, character = await self.__get_member(author, user, ctx.message.server.id)
+            rank, character = await self.__get_member(author, user, ctx.message.guild.id)
             if character is None:
-                await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
+                await ctx.send(codify('Could not find character to update, Make sure they are in the system.'))
                 return
 
             fame = character.fame
@@ -99,11 +99,11 @@ class Update:
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
             logActivity('{} has updated {} on {}'.format(character.fam_name, attribute['name'], character.char_name), author.name)
-            await self.bot.say(codify('Updating {} for {} was a great success :D\n\n'.format(attribute['name'], character.char_name) + data))
+            await ctx.send(codify('Updating {} for {} was a great success :D\n\n'.format(attribute['name'], character.char_name) + data))
 
         except Exception as e:
             print_error(e)
-            await self.bot.say(codify("Error updating character"))
+            await ctx.send(codify("Error updating character"))
 
     @commands.group(pass_context=True)
     async def update(self, ctx):
@@ -111,7 +111,7 @@ class Update:
 
         # Checks if no sub-commands are invoked
         if ctx.invoked_subcommand is None:
-            await self.bot.say(codify("Update main character information by one category or all. use gsbot help update "
+            await ctx.send(codify("Update main character information by one category or all. use gsbot help update "
                                       "for more info. ex. gsbot update ap 230 or gsbot update all 61 200 230 250 4.5"))
 
     @update.command(pass_context=True)
@@ -121,9 +121,9 @@ class Update:
 
         try:
             author = ctx.message.author
-            rank, character = await self.__get_member(author, user, ctx.message.server.id)
+            rank, character = await self.__get_member(author, user, ctx.message.guild.id)
             if character is None:
-                await self.bot.say(codify('Could not find character to update, Make sure they are in the system.'))
+                await ctx.send(codify('Could not find character to update, Make sure they are in the system.'))
                 return
 
             # Adds historical data to database
@@ -146,11 +146,11 @@ class Update:
             row = get_row([character], False)
             data = tabulate(row, HEADERS, 'simple')
             logActivity('{} has updated a character'.format(character.fam_name), author.name)
-            await self.bot.say(codify('Updating {} was a great success :D\n\n'.format(character.fam_name) + data))
+            await ctx.send(codify('Updating {} was a great success :D\n\n'.format(character.fam_name) + data))
 
         except Exception as e:
             print_error(e)
-            await self.bot.say("Error updating user")
+            await ctx.send("Error updating user")
 
     @update.command(pass_context=True)
     async def ap(self, ctx, ap: int, user: discord.User = None):
@@ -192,7 +192,7 @@ class Update:
                 response = upload(url, tags=PIC_TAG)
             else:
                 if not attachments:
-                    await self.bot.say('You must either attach a picture or provide a url')
+                    await ctx.send('You must either attach a picture or provide a url')
                     return
                 response = upload(attachments[0]['url'], tags=PIC_TAG)
 
