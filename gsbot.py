@@ -92,15 +92,15 @@ async def on_command_error(ctx, error):
 
     # For this error example we check to see where it came from...
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('This command is missing a required argument. Try gsbot help ' + ctx.command)
+        await ctx.send('This command is missing a required argument. Try gsbot help ' + str(ctx.command))
 
     elif isinstance(error, commands.ArgumentParsingError):
-        await ctx.send('Could not understand the arguments given. Try gsbot help ' + ctx.command)
+        await ctx.send('Could not understand the arguments given. Try gsbot help ' + str(ctx.command))
 
     else:
         # All other Errors not returned come here. And we can just print the default TraceBack.
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-        await ctx.send('Something went horribly wrong with the command' + ctx.command)
+        await ctx.send('Something went horribly wrong with the command' + str(ctx.command))
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 bot.run(TOKEN, bot=True, reconnect=True)
