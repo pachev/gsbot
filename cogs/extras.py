@@ -1,8 +1,5 @@
-import discord
-from discord.ext import commands
-from tabulate import tabulate
-from datetime import datetime
 from cloudinary.uploader import upload
+from tabulate import tabulate
 
 from models.character import Character
 from utils import *
@@ -16,7 +13,10 @@ class Extras(commands.Cog):
 
     @commands.command(pass_context=True)
     async def attach_pic(self, ctx, url: str = None):
-        """ Command to attach a picture to your character. When someone looks you up the attached picture is displayed"""
+        """
+        Command to attach a picture to your character.
+        When someone looks you up, the attached picture is displayed
+        """
         try:
             author = ctx.message.author
             attachments = ctx.message.attachments
@@ -31,7 +31,7 @@ class Extras(commands.Cog):
                 if not attachments:
                     await ctx.send('You must either attach a picture or provide a url')
                     return
-                response = upload(attachments[0]['url'], tags=PIC_TAG)
+                response = upload(attachments[0].url, tags=PIC_TAG)
 
             character.gear_pic = response['url']
             character.save()

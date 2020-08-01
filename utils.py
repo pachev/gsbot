@@ -70,7 +70,7 @@ CHARACTER_CLASS_SHORT = {
 }
 
 DESCRIPTION = '''
-https://discord.gg/B8My2zw
+https://discord.gg/STa7Ebz
 
 This the official Gear Score bot for Black Desert Online. 
 For visual data go to: https://gsbot.pachevjoseph.com

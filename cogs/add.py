@@ -1,14 +1,15 @@
-import discord
-from discord.ext import commands
-from tabulate import tabulate
+import math
 from datetime import datetime
 
+import discord
+from tabulate import tabulate
+
 from models.character import Character
-from models.member import Member
 from models.historical import Historical
+from models.member import Member
 from models.server import Server
 from utils import *
-import math
+
 
 class Add(commands.Cog):
     """Add commands."""
@@ -16,7 +17,7 @@ class Add(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def __get_rank_and_member(self, author, user, roles):
+    async def __get_rank_and_member(self, author, user, roles, ctx):
         if not user:
             discord_user = author
             rank = 'Officer' if ADMIN_USER in roles else 'Member'
@@ -31,8 +32,8 @@ class Add(commands.Cog):
             if ADMIN_USER not in roles:
                 await ctx.send(codify("Only officers may perform this action"))
                 return (None, None)
-        
-        return (rank, discord_user)
+
+        return rank, discord_user
 
     def __get_server_and_member(self, discord_server, discord_user):
         member = Member.objects(discord=discord_user.id).first()
@@ -68,8 +69,8 @@ class Add(commands.Cog):
                   fam_name,
                   char_name,
                   level: int,
-                  ap : int,
-                  aap : int,
+                  ap: int,
+                  aap: int,
                   dp: int,
                   char_class,
                   user: discord.User = None):
@@ -86,15 +87,14 @@ class Add(commands.Cog):
             author = ctx.message.author
             discord_server = ctx.message.guild
             roles = [u.name for u in author.roles]
-            rank, discord_user = await self.__get_rank_and_member(author, user, roles)
+            rank, discord_user = await self.__get_rank_and_member(author, user, roles, ctx)
             server, member = self.__get_server_and_member(discord_server, discord_user)
 
             if rank is None or discord_user.id is None:
                 return
 
             character = Character.primary_chars(member=discord_user.id).first()
-            isPrimary = False if character else True
-
+            is_primary = False if character else True
 
             character = Character.create({
                 'rank': rank,
@@ -107,8 +107,8 @@ class Add(commands.Cog):
                 'aap': aap,
                 'dp': dp,
                 'gear_score': max(aap, ap) + dp,
-                'renown_score': math.trunc((ap+aap)/2 + dp),
-                'primary': isPrimary,
+                'renown_score': math.trunc((ap + aap) / 2 + dp),
+                'primary': is_primary,
                 'member': discord_user.id,
             })
             member.characters.append(character)
@@ -118,18 +118,18 @@ class Add(commands.Cog):
             data = tabulate(row, HEADERS, 'simple')
             logActivity('{} has added a character'.format(character.fam_name), user.name if user else author.name)
             await ctx.send(codify("Success Adding Character for member {} :D\n\n".
-                                      format(discord_user.name.upper()) + data))
+                                  format(discord_user.name.upper()) + data))
 
         except Exception as e:
             print_error(e)
             await ctx.send("Something went horribly wrong")
 
     @commands.command(pass_context=True)
-    async def reroll(self, ctx, new_char_name, level: int, ap : int, aap: int, dp: int, new_char_class):
+    async def reroll(self, ctx, new_char_name, level: int, ap: int, aap: int, dp: int, new_char_class):
         """Just for someone special: Allows you to reroll your main character """
 
         author = ctx.message.author.id
-        character = Character.primary_chars(member = author).first()
+        character = Character.primary_chars(member=author).first()
         date = datetime.now()
         if not character:
             await ctx.send("Can't reroll if you're not in the database :(, try adding a character first")
@@ -140,12 +140,12 @@ class Add(commands.Cog):
 
         else:
             try:
-                ## Adds historical data to database
+                # Adds historical data to database
                 update = Historical.create({
                     'type': "reroll",
                     'char_class': character.char_class.upper(),
                     'timestamp': date,
-                    'level':float(str(character.level) + '.' + str(round(character.progress))) ,
+                    'level': float(str(character.level) + '.' + str(round(character.progress))),
                     'ap': character.ap,
                     'aap': character.aap,
                     'dp': character.dp,
@@ -164,22 +164,23 @@ class Add(commands.Cog):
                     'dp': dp,
                     'level': level,
                     'gear_score': max(aap, ap) + dp,
-                    'renown_score': math.trunc((ap+aap)/2 + dp) + fame,
+                    'renown_score': math.trunc((ap + aap) / 2 + dp) + fame,
                     'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data
                 })
-                
+
                 row = get_row([character], False)
                 data = tabulate(row, HEADERS, 'simple')
 
                 logActivity('{} has rerolled a character'.format(character.fam_name), ctx.message.author.name)
                 reminder = '\n\nRemember to add a new pic with gsbot attach_pic!'
-                await ctx.send(codify("Success Rerolling\n\n" + data + reminder ))
+                await ctx.send(codify("Success Rerolling\n\n" + data + reminder))
 
             except Exception as e:
                 print_error(e)
                 await ctx.send("Could not reroll")
+
 
 def setup(bot):
     bot.add_cog(Add(bot))
