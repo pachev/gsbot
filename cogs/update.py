@@ -57,7 +57,7 @@ class Update(commands.Cog):
             if attribute['name'] == 'aap':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
-                    'gear_score': max(character.ap, attribute['value']) + character.dp,
+                    'gear_score': math.trunc((character.ap + attribute['value']) / 2) + character.dp,
                     'renown_score': math.trunc((character.ap + attribute['value']) / 2 + character.dp) + fame,
                     'updated': date,
                     'rank': rank,
@@ -66,7 +66,7 @@ class Update(commands.Cog):
             elif attribute['name'] == 'ap':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
-                    'gear_score': max(attribute['value'], character.aap) + character.dp,
+                    'gear_score': math.trunc((attribute['value'] + character.aap) / 2) + character.dp,
                     'renown_score': math.trunc((attribute['value'] + character.aap) / 2 + character.dp) + fame,
                     'updated': date,
                     'rank': rank,
@@ -75,7 +75,7 @@ class Update(commands.Cog):
             elif attribute['name'] == 'dp':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
-                    'gear_score': attribute['value'] + max(character.aap, character.ap),
+                    'gear_score': math.trunc((character.ap + character.aap) / 2) + attribute['value'],
                     'renown_score': math.trunc((character.ap + character.aap) / 2 + attribute['value']) + fame,
                     'updated': date,
                     'rank': rank,
@@ -136,7 +136,7 @@ class Update(commands.Cog):
                 'aap': aap,
                 'dp': dp,
                 'level': level,
-                'gear_score': max(aap, ap) + dp,
+                'gear_score': math.trunc((ap + aap) / 2) + dp,
                 'renown_score': math.trunc((ap + aap) / 2 + dp),
                 'progress': level_percent,
                 'updated': date,
