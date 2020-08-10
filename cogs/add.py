@@ -77,7 +77,7 @@ class Add(commands.Cog):
         """Adds your primary character to the guild. This character is linked with your
         discord id and can only be updated by either that member or an officer.
         **Officers can add a user by tagging them at the end. eg @drawven**
-        Note: Total gear score, and rank are auto calculated."""
+        Note: Total gear score, renown score, and rank are auto calculated."""
 
         # Checks character name to make sure it is correct
         try:
@@ -106,7 +106,7 @@ class Add(commands.Cog):
                 'ap': ap,
                 'aap': aap,
                 'dp': dp,
-                'gear_score': math.trunc((ap + aap) / 2) + dp,
+                'gear_score': max(aap, ap) + dp,
                 'renown_score': math.trunc((ap + aap) / 2 + dp),
                 'primary': is_primary,
                 'member': discord_user.id,
@@ -163,7 +163,7 @@ class Add(commands.Cog):
                     'aap': aap,
                     'dp': dp,
                     'level': level,
-                    'gear_score': math.trunc((ap + aap) / 2) + dp,
+                    'gear_score': max(aap, ap) + dp,
                     'renown_score': math.trunc((ap + aap) / 2 + dp) + fame,
                     'char_class': new_char_class.upper(),
                     'updated': date,
