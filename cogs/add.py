@@ -164,7 +164,7 @@ class Add(commands.Cog):
                     'dp': dp,
                     'level': level,
                     'gear_score': max(aap, ap) + dp,
-                    'renown_score': math.trunc((ap + aap) / 2 + dp) + fame,
+                    'renown_score': math.trunc((ap + aap) / 2 + dp),
                     'char_class': new_char_class.upper(),
                     'updated': date,
                     'hist_data': historical_data
