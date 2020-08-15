@@ -58,7 +58,7 @@ class Update(commands.Cog):
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score': max(character.ap, attribute['value']) + character.dp,
-                    'renown_score': math.trunc((character.ap + attribute['value']) / 2 + character.dp) + fame,
+                    'renown_score': math.trunc((character.ap + attribute['value']) / 2 + character.dp),
                     'updated': date,
                     'rank': rank,
                 })
@@ -67,7 +67,7 @@ class Update(commands.Cog):
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score': max(attribute['value'], character.aap) + character.dp,
-                    'renown_score': math.trunc((attribute['value'] + character.aap) / 2 + character.dp) + fame,
+                    'renown_score': math.trunc((attribute['value'] + character.aap) / 2 + character.dp),
                     'updated': date,
                     'rank': rank,
                 })
@@ -76,17 +76,11 @@ class Update(commands.Cog):
                 character.update_attributes({
                     attribute['name']: attribute['value'],
                     'gear_score': attribute['value'] + max(character.aap, character.ap),
-                    'renown_score': math.trunc((character.ap + character.aap) / 2 + attribute['value']) + fame,
+                    'renown_score': math.trunc((character.ap + character.aap) / 2 + attribute['value']),
                     'updated': date,
                     'rank': rank,
                 })
-            elif attribute['name'] == 'fame':
-                character.update_attributes({
-                    attribute['name']: attribute['value'],
-                    'renown_score': math.trunc((character.ap + character.aap) / 2 + character.dp) + attribute['value'],
-                    'updated': date,
-                    'rank': rank,
-                })
+                
             else:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
