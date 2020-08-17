@@ -1,0 +1,19 @@
+[auth]
+token = some_long_token_from_discord_that_you_retrieved
+user = test
+pwd = test
+
+[cloudinary]
+has_cloud_storage = False
+cloud_name = some_name
+api_key = some_api_key
+api_secret = some_api_secret
+
+[db]
+name = gsbot
+port = 27017
+host = database
+character_collection = character
+server_collection = server
+member_collection = member
+historical_collection = historical

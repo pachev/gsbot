@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  database:
+    restart: always
+    image: bitnami/mongodb:latest
+    container_name: gsbot-db
+    ports:
+      - "27017:27017"
+    environment: 
+      - MONGODB_DATABASE=gsbot
+      - MONGODB_USERNAME=test
+      - MONGODB_PASSWORD=test
+    volumes:
+      - db:/bitnami/mongodb
+  gsbot:
+    restart: always
+    build:
+      context: .
+    container_name: gsbot
+    links:
+      - database
+    depends_on:
+      - database
+
+volumes:
+  db:
+    driver: local
+  go:
+    driver: local

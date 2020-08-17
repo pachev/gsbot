@@ -8,8 +8,7 @@
 ### Description
 
 A python application to help manage guild members and their gear score for 
-Black Desert Online. This specific bot is made for Sazerac guild but can be
-adjusted for use with any other guild. The link to view this data visually
+Black Desert Online. The link to view this data visually
 is at [https://gsbot.pachevjoseph.com](https://gsbot.pachevjoseph.com)
 
 
@@ -18,8 +17,24 @@ is at [https://gsbot.pachevjoseph.com](https://gsbot.pachevjoseph.com)
 - Mongodb
 - discord.py
 
-## Installation
+Optional
+- [Docker][6]
+- [Docker Compose][7]
 
+
+## Running With Docker And Docker Compose
+_This assumes that you have docker and docker-compose installed_
+
+Ensure that you have setup a file called `config.ini` in the root directory.
+There is a sample file called `config.ini.example` to use as a template. After, 
+run the following command:
+```
+docker-compose up
+```
+This will build the gsbot along with all dependencies and start it using the token
+you've provided.
+
+## Running Locally
 
 ### Python Virtual Environment
 
@@ -50,8 +65,6 @@ Then from the root of the project run:
 4. `pip install -r requirements.txt` - Install dependencies
 5. `deactivate` - Unloads the environment
 
-## Running
-
 Once your dependencies are installed, there are a couple of steps you need to do before running.
 
 1. create a`config.ini` file inside of the main directory
@@ -63,8 +76,8 @@ settings
 ```ini
 [auth]
 token = ... #This is where you put your bot token that you get from discord
-user = user
-pwd = pwd
+user = test
+pwd = test
 
 [cloudinary]
 has_cloud_storage = False
@@ -75,7 +88,7 @@ api_secret = some_api_secret
 [db]
 name = gsbot
 port = 27017
-host = localhost
+host = database
 character_collection = character
 server_collection = server
 member_collection = member
@@ -87,8 +100,6 @@ that is inside of the config file. The bot, as it stands, is configured to conne
 a localhost instance of mongo on port 27017. If you would like different configurations,
 make sure you change the config file accordingly.
 
-
-
 ### Thanks to
 A python application using [discord.py][1]
 
@@ -97,3 +108,5 @@ A python application using [discord.py][1]
 [3]: https://docs.python.org/3/library/venv.html
 [4]: https://pip.pypa.io/en/latest/installing/
 [5]: https://cloudinary.com/
+[6]: https://docs.docker.com/get-docker/
+[7]: https://docs.docker.com/compose/install/

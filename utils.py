@@ -7,6 +7,7 @@ import sys
 # basic information
 from models.server_settings import ServerSettings
 
+# TODO: User Environmental Variables instead of ini file
 CONFIG = ConfigParser(allow_no_value=True)
 CONFIG.read('config.ini')
 
