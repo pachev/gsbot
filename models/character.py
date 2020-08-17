@@ -24,7 +24,8 @@ class Character(Document, ModelMixin):
         'gear_pic', 
         'primary',
         'member',
-        'hist_data'
+        'hist_data',
+        'playstyle'
     ]
 
     rank = StringField(max_length=50)
@@ -45,6 +46,7 @@ class Character(Document, ModelMixin):
     primary = BooleanField()
     member = IntField()
     hist_data = ListField(ReferenceField(Historical))
+    playstyle = StringField(max_length=50, default='Awakening')
     meta = {
         'collection' : CHARACTER_COLLECTION,
     }

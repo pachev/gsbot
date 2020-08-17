@@ -18,6 +18,8 @@ services:
     build:
       context: .
     container_name: gsbot
+    volumes:
+      - .:/app
     links:
       - database
     depends_on:

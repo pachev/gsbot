@@ -53,7 +53,6 @@ class Update(commands.Cog):
                 await ctx.send(codify('Could not find character to update, Make sure they are in the system.'))
                 return
 
-            fame = character.fame
             if attribute['name'] == 'aap':
                 character.update_attributes({
                     attribute['name']: attribute['value'],
@@ -80,7 +79,20 @@ class Update(commands.Cog):
                     'updated': date,
                     'rank': rank,
                 })
-                
+            elif attribute['name'] == 'playstyle':
+                val = attribute['value']
+                if val.lower() == 'awakening':
+                    character.update_attributes({
+                        attribute['name']: 'Awakening',
+                    })
+                elif val.lower() == 'succession':
+                    character.update_attributes({
+                        attribute['name']: 'Succession',
+                    })
+                else:
+                    await ctx.send(codify("Playstyle can only be Awakening or Succession"))
+                    return
+
             else:
                 character.update_attributes({
                     attribute['name']: attribute['value'],
@@ -175,6 +187,11 @@ class Update(commands.Cog):
     async def fame(self, ctx, fame: int, user: discord.User = None):
         """Updates user's main character's fame. **Officers can tag another user to update for them """
         await self.update_attribute(ctx, {'name': 'fame', 'value': fame}, user)
+
+    @update.command(pass_context=True)
+    async def playstyle(self, ctx, playstyle: str, user: discord.User = None):
+        """Updates user's main character's playstyle. **Officers can tag another user to update for them """
+        await self.update_attribute(ctx, {'name': 'playstyle', 'value': playstyle}, user)
 
     @update.command(pass_context=True)
     async def pic(self, ctx, url: str = None):
