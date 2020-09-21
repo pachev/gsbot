@@ -1,5 +1,5 @@
 ---
-name: "GSBOT Tests"
+name: "GSBOT Build and Tests"
 
 on: [push]
 
