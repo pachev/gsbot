@@ -16,4 +16,5 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Run Tests
         run: |
+          cp config.ini.example config.ini
           docker-compose run gsbot sh -c "python -m pytest"
