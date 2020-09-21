@@ -81,13 +81,9 @@ class Update(commands.Cog):
                 })
             elif attribute['name'] == 'playstyle':
                 val = attribute['value']
-                if val.lower() == 'awakening':
+                if is_playstyle_valid(val):
                     character.update_attributes({
-                        attribute['name']: 'Awakening',
-                    })
-                elif val.lower() == 'succession':
-                    character.update_attributes({
-                        attribute['name']: 'Succession',
+                        attribute['name']: val.title(),
                     })
                 else:
                     await ctx.send(codify("Playstyle can only be Awakening or Succession"))
@@ -121,7 +117,15 @@ class Update(commands.Cog):
                                   "for more info. ex. gsbot update ap 230 or gsbot update all 61 200 230 250 4.5"))
 
     @update.command(pass_context=True)
-    async def all(self, ctx, level: int, ap: int, aap: int, dp: int, level_percent: float, user: discord.User = None):
+    async def all(self,
+                  ctx,
+                  level: int,
+                  ap: int,
+                  aap: int,
+                  dp: int,
+                  level_percent: float = None,
+                  playstyle: str = None,
+                  user: discord.User = None):
         """Updates user's main character's information. **Officers can tag another user to update for them """
         date = datetime.now()
 
@@ -137,6 +141,9 @@ class Update(commands.Cog):
             historical_data = character.hist_data
             historical_data.append(update)
 
+            playstyle = playstyle if is_playstyle_valid(playstyle) else character.playstyle
+            progress = character.progress if level_percent is None else level_percent
+
             character.update_attributes({
                 'ap': ap,
                 'aap': aap,
@@ -144,7 +151,8 @@ class Update(commands.Cog):
                 'level': level,
                 'gear_score': math.trunc((ap + aap) / 2 + dp),
                 'renown_score': math.trunc((ap + aap) / 2 + dp),
-                'progress': level_percent,
+                'progress': progress,
+                'playstyle': playstyle,
                 'updated': date,
                 'hist_data': historical_data
             })
