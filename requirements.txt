@@ -4,3 +4,4 @@ discord.py
 tabulate
 aiohttp
 websockets
+pytest

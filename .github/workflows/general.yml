@@ -1,0 +1,18 @@
+---
+name: "GSBOT Tests"
+
+jobs:
+  gsbot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Run Tests
+        run: |
+          cd etl
+          docker-compose run gsbot sh -c "python -m pytest"

@@ -73,6 +73,7 @@ class Add(commands.Cog):
                   aap: int,
                   dp: int,
                   char_class,
+                  playstyle = None,
                   user: discord.User = None):
         """Adds your primary character to the guild. This character is linked with your
         discord id and can only be updated by either that member or an officer.
@@ -106,6 +107,7 @@ class Add(commands.Cog):
                 'ap': ap,
                 'aap': aap,
                 'dp': dp,
+                'playstyle': playstyle.title() if is_playstyle_valid(playstyle) else None,
                 'gear_score': math.trunc((ap + aap) / 2 + dp),
                 'renown_score': math.trunc((ap + aap) / 2 + dp),
                 'primary': is_primary,

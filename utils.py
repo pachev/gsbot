@@ -194,3 +194,8 @@ async def send_or_display(server: int, author, ctx, content):
             return
 
     await ctx.send(content)
+
+
+def is_playstyle_valid(playstyle: str) -> bool:
+    val = playstyle if playstyle is not None else ""
+    return val.lower() in ["awakening", "succession"]
