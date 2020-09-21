@@ -1,6 +1,8 @@
 ---
 name: "GSBOT Tests"
 
+on: [push]
+
 jobs:
   gsbot:
     runs-on: ubuntu-latest
