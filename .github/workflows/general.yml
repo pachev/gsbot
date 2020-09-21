@@ -16,5 +16,4 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Run Tests
         run: |
-          cd etl
           docker-compose run gsbot sh -c "python -m pytest"
