@@ -60,7 +60,8 @@ CHARACTER_CLASSES = [
     "SHAI",
     "GUARDIAN",
     "HASHASHIN",
-    "NOVA"
+    "NOVA",
+    "SAGE"
 ]
 
 CHARACTER_CLASS_SHORT = {
