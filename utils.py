@@ -61,7 +61,8 @@ CHARACTER_CLASSES = [
     "GUARDIAN",
     "HASHASHIN",
     "NOVA",
-    "SAGE"
+    "SAGE",
+    "CORSAIR",
 ]
 
 CHARACTER_CLASS_SHORT = {
@@ -71,6 +72,7 @@ CHARACTER_CLASS_SHORT = {
     "SORC": "SORCERESS",
     "VALK": "VALKYRIE",
     "WIZ": "WIZARD",
+    "COR": "CORSAIR",
 }
 
 DESCRIPTION = '''
